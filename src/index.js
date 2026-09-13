@@ -1,4 +1,4 @@
-// CapsuleCrush — 好きなところをカプセルに詰めてガシャポンで楽しむアプリ
+// CapsuleCrush — capsule the things you love, one gashapon pull at a time
 // Cloudflare Workers + Hono + D1 + R2
 
 import { Hono } from "hono";
@@ -24,14 +24,14 @@ function isValidPasscode(passcode) {
 async function requireAuth(c, next) {
   const auth = c.req.header("authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
-  if (!token) return c.json({ error: "認証が必要です" }, 401);
+  if (!token) return c.json({ error: "Authentication required" }, 401);
 
   const session = await c.env.DB.prepare(
     `SELECT user_id FROM sessions WHERE token = ?`
   )
     .bind(token)
     .first();
-  if (!session) return c.json({ error: "セッションが無効です" }, 401);
+  if (!session) return c.json({ error: "Session is invalid" }, 401);
 
   c.set("userId", session.user_id);
   await next();
@@ -44,17 +44,17 @@ app.post("/api/auth/signup", async (c) => {
   const { username, passcode } = body;
 
   if (!isValidUsername(username)) {
-    return c.json({ error: "ユーザー名は英数字とアンダースコアで3〜32文字にしてください" }, 400);
+    return c.json({ error: "Username must be 3-32 characters (letters, numbers, underscore)" }, 400);
   }
   if (!isValidPasscode(passcode)) {
-    return c.json({ error: "パスコードは4〜64文字にしてください" }, 400);
+    return c.json({ error: "Passcode must be 4-64 characters" }, 400);
   }
 
   const existing = await c.env.DB.prepare(`SELECT id FROM users WHERE username = ?`)
     .bind(username)
     .first();
   if (existing) {
-    return c.json({ error: "そのユーザー名はすでに使われています" }, 409);
+    return c.json({ error: "That username is already taken" }, 409);
   }
 
   const userId = uuid();
@@ -78,7 +78,7 @@ app.post("/api/auth/login", async (c) => {
   const { username, passcode } = body;
 
   if (!isValidUsername(username) || !isValidPasscode(passcode)) {
-    return c.json({ error: "ユーザー名またはパスコードが正しくありません" }, 401);
+    return c.json({ error: "Username or passcode is incorrect" }, 401);
   }
 
   const user = await c.env.DB.prepare(
@@ -87,12 +87,12 @@ app.post("/api/auth/login", async (c) => {
     .bind(username)
     .first();
   if (!user) {
-    return c.json({ error: "ユーザー名またはパスコードが正しくありません" }, 401);
+    return c.json({ error: "Username or passcode is incorrect" }, 401);
   }
 
   const passcodeHash = await sha256Hex(passcode);
   if (passcodeHash !== user.passcode_hash) {
-    return c.json({ error: "ユーザー名またはパスコードが正しくありません" }, 401);
+    return c.json({ error: "Username or passcode is incorrect" }, 401);
   }
 
   const token = uuid();
@@ -136,7 +136,7 @@ app.get("/api/capsules/random", requireAuth, async (c) => {
   )
     .bind(userId)
     .first();
-  if (!capsule) return c.json({ error: "カプセルがまだありません" }, 404);
+  if (!capsule) return c.json({ error: "No capsules yet" }, 404);
   return c.json({ capsule });
 });
 
@@ -146,10 +146,10 @@ app.post("/api/capsules", requireAuth, async (c) => {
   const { text, memo_date, image_key } = body;
 
   if (typeof text !== "string" || text.trim().length === 0) {
-    return c.json({ error: "好きなところを入力してください" }, 400);
+    return c.json({ error: "Please write what you love" }, 400);
   }
   if (text.length > 2000) {
-    return c.json({ error: "テキストが長すぎます" }, 400);
+    return c.json({ error: "Text is too long" }, 400);
   }
 
   const id = uuid();
@@ -179,13 +179,13 @@ app.put("/api/capsules/:id", requireAuth, async (c) => {
   )
     .bind(id, userId)
     .first();
-  if (!existing) return c.json({ error: "カプセルが見つかりません" }, 404);
+  if (!existing) return c.json({ error: "Capsule not found" }, 404);
 
   if (typeof text !== "string" || text.trim().length === 0) {
-    return c.json({ error: "好きなところを入力してください" }, 400);
+    return c.json({ error: "Please write what you love" }, 400);
   }
   if (text.length > 2000) {
-    return c.json({ error: "テキストが長すぎます" }, 400);
+    return c.json({ error: "Text is too long" }, 400);
   }
 
   await c.env.DB.prepare(
@@ -212,7 +212,7 @@ app.delete("/api/capsules/:id", requireAuth, async (c) => {
   )
     .bind(id, userId)
     .first();
-  if (!existing) return c.json({ error: "カプセルが見つかりません" }, 404);
+  if (!existing) return c.json({ error: "Capsule not found" }, 404);
 
   await c.env.DB.prepare(`DELETE FROM capsules WHERE id = ? AND user_id = ?`)
     .bind(id, userId)
@@ -236,21 +236,21 @@ const ALLOWED_IMAGE_TYPES = {
 
 app.post("/api/upload", requireAuth, async (c) => {
   if (!c.env.IMAGES) {
-    return c.json({ error: "画像機能は現在準備中です" }, 503);
+    return c.json({ error: "Image uploads are not available yet" }, 503);
   }
   const userId = c.get("userId");
   const formData = await c.req.formData().catch(() => null);
   const file = formData?.get("image");
 
   if (!file || typeof file === "string") {
-    return c.json({ error: "画像ファイルを送信してください" }, 400);
+    return c.json({ error: "Please attach an image file" }, 400);
   }
   const ext = ALLOWED_IMAGE_TYPES[file.type];
   if (!ext) {
-    return c.json({ error: "対応していない画像形式です（jpg/png/webp/gif）" }, 400);
+    return c.json({ error: "Unsupported image format (jpg/png/webp/gif only)" }, 400);
   }
   if (file.size > 8 * 1024 * 1024) {
-    return c.json({ error: "画像サイズは8MB以下にしてください" }, 400);
+    return c.json({ error: "Image size must be 8MB or less" }, 400);
   }
 
   const key = `${userId}/${uuid()}.${ext}`;

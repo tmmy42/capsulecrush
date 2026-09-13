@@ -1,64 +1,92 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>CapsuleCrush</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2244%22 fill=%22%23FF5FA0%22 stroke=%22%231A1A1A%22 stroke-width=%226%22/></svg>" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+<!-- Lucide icon sprite: symbols defined once, referenced via <use> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="icon-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="icon-pen" viewBox="0 0 24 24"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></symbol>
+    <symbol id="icon-image-plus" viewBox="0 0 24 24"><path d="M16 5h6"/><path d="M19 2v6"/><path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><circle cx="9" cy="9" r="2"/></symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="icon-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
+    <symbol id="icon-package-open" viewBox="0 0 24 24"><path d="M12 22v-9"/><path d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z"/><path d="M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13"/><path d="M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z"/></symbol>
+    <symbol id="deco-star" viewBox="0 0 40 40">
+      <path d="M20 2 L24.5 15.5 L38 20 L24.5 24.5 L20 38 L15.5 24.5 L2 20 L15.5 15.5 Z" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="deco-wave" viewBox="0 0 60 16">
+      <path d="M2 8c4-7 10-7 14 0s10 7 14 0 10-7 14 0 10 7 14 0" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
 <div id="app">
 
   <!-- ===== AUTH SCREEN ===== -->
-  <section id="screen-auth" class="screen">
+  <section id="screen-auth" class="screen screen-auth">
+    <svg class="auth-deco deco-star star-a" aria-hidden="true"><use href="#deco-star"/></svg>
+    <div class="auth-deco deco-dot dot-a" aria-hidden="true"></div>
+    <svg class="auth-deco deco-wave wave-a" aria-hidden="true"><use href="#deco-wave"/></svg>
     <div class="auth-card">
       <h1 class="logo">CapsuleCrush</h1>
-      <p class="tagline">好きなところをカプセルに詰めよう💗</p>
+      <p class="tagline">Capsule the things you love</p>
 
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">ログイン</button>
-        <button class="auth-tab" data-tab="signup">新規登録</button>
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab active" data-tab="login" role="tab" aria-selected="true">Log In</button>
+        <button class="auth-tab" data-tab="signup" role="tab" aria-selected="false">Sign Up</button>
       </div>
 
       <form id="form-login" class="auth-form">
-        <label>ユーザー名
-          <input type="text" id="login-username" autocomplete="username" required maxlength="32" />
-        </label>
-        <label>パスコード
-          <input type="password" id="login-passcode" autocomplete="current-password" required maxlength="64" />
-        </label>
-        <button type="submit" class="btn btn-primary">ログイン</button>
-        <p class="auth-error" id="login-error"></p>
+        <label class="field-label" for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" required maxlength="32" />
+
+        <label class="field-label" for="login-passcode">Passcode</label>
+        <input type="password" id="login-passcode" autocomplete="current-password" required maxlength="64" />
+
+        <button type="submit" class="btn btn-primary btn-block">Log In</button>
+        <p class="form-error" id="login-error" role="alert"></p>
       </form>
 
       <form id="form-signup" class="auth-form hidden">
-        <label>ユーザー名（英数字・アンダースコア、3〜32文字）
-          <input type="text" id="signup-username" autocomplete="username" required maxlength="32" />
-        </label>
-        <label>パスコード（4〜64文字）
-          <input type="password" id="signup-passcode" autocomplete="new-password" required maxlength="64" />
-        </label>
-        <button type="submit" class="btn btn-primary">はじめる</button>
-        <p class="auth-error" id="signup-error"></p>
+        <label class="field-label" for="signup-username">Username <span class="hint">letters, numbers, underscore · 3-32</span></label>
+        <input type="text" id="signup-username" autocomplete="username" required maxlength="32" />
+
+        <label class="field-label" for="signup-passcode">Passcode <span class="hint">4-64 characters</span></label>
+        <input type="password" id="signup-passcode" autocomplete="new-password" required maxlength="64" />
+
+        <button type="submit" class="btn btn-primary btn-block">Get Started</button>
+        <p class="form-error" id="signup-error" role="alert"></p>
       </form>
     </div>
   </section>
 
   <!-- ===== HOME (GASHAPON) SCREEN ===== -->
-  <section id="screen-home" class="screen hidden">
+  <section id="screen-home" class="screen screen-home hidden">
     <header class="topbar">
-      <h1 class="logo small">CapsuleCrush</h1>
-      <button id="btn-logout" class="btn-icon" title="ログアウト">⎋</button>
+      <h1 class="logo logo-sm">CapsuleCrush</h1>
+      <button id="btn-logout" class="icon-btn" title="Log out" aria-label="Log out">
+        <svg class="icon" aria-hidden="true"><use href="#icon-logout"/></svg>
+      </button>
     </header>
 
     <div class="gasha-stage">
-      <div class="deco star star-1">★</div>
-      <div class="deco dot dot-1"></div>
-      <div class="deco dot dot-2"></div>
-      <div class="deco wave wave-1">〜</div>
-      <div class="deco star star-2">★</div>
+      <svg class="deco deco-star star-1" aria-hidden="true"><use href="#deco-star"/></svg>
+      <div class="deco deco-dot dot-1" aria-hidden="true"></div>
+      <div class="deco deco-dot dot-2" aria-hidden="true"></div>
+      <svg class="deco deco-wave wave-1" aria-hidden="true"><use href="#deco-wave"/></svg>
+      <svg class="deco deco-star star-2" aria-hidden="true"><use href="#deco-star"/></svg>
 
       <div class="machine">
         <div class="machine-dome">
@@ -88,72 +116,92 @@
         <div class="capsule-bottom"></div>
       </div>
 
-      <button id="btn-gasha" class="btn btn-gasha">レバーを引く 🎰</button>
+      <button id="btn-gasha" class="btn btn-gasha">
+        <svg class="icon" aria-hidden="true"><use href="#icon-rotate"/></svg>
+        Pull the Lever
+      </button>
     </div>
 
     <div id="empty-state" class="empty-state hidden">
-      <p>まだ好きなところが貯まっていません🌱</p>
-      <button class="btn btn-secondary" data-nav="post">最初のカプセルを作る</button>
+      <p>No capsules yet — start your collection.</p>
+      <button class="btn btn-secondary" data-nav="post">Add Your First Capsule</button>
     </div>
 
     <!-- Result modal -->
-    <div id="result-modal" class="modal hidden">
+    <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="result-text">
       <div class="modal-card">
-        <button class="modal-close" id="result-close">×</button>
-        <div class="capsule-open-icon">💌</div>
+        <button class="icon-btn modal-close" id="result-close" aria-label="Close">
+          <svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg>
+        </button>
+        <svg class="capsule-open-icon" aria-hidden="true"><use href="#icon-package-open"/></svg>
         <p class="result-date" id="result-date"></p>
-        <p class="result-text" id="result-text"></p>
-        <img id="result-image" class="result-image hidden" alt="思い出の写真" />
-        <button class="btn btn-primary" id="result-again">もう一回引く</button>
+        <p class="result-text" id="result-text" lang="ja"></p>
+        <img id="result-image" class="result-image hidden" alt="Attached memory photo" />
+        <button class="btn btn-primary btn-block" id="result-again">
+          <svg class="icon" aria-hidden="true"><use href="#icon-rotate"/></svg>
+          Pull Again
+        </button>
       </div>
     </div>
   </section>
 
   <!-- ===== POST SCREEN ===== -->
-  <section id="screen-post" class="screen hidden">
+  <section id="screen-post" class="screen screen-post hidden">
     <header class="topbar">
-      <h1 class="logo small" id="post-title">好きなところを追加</h1>
+      <h1 class="logo logo-sm" id="post-title">New Capsule</h1>
     </header>
 
     <form id="form-post" class="post-form">
-      <label>好きなところ <span class="req">必須</span>
-        <textarea id="post-text" required maxlength="2000" rows="5" placeholder="例）朝いちばんに『おはよう』って連絡くれるところ"></textarea>
-      </label>
+      <label class="field-label" for="post-text">What you love <span class="req">Required</span></label>
+      <textarea id="post-text" required maxlength="2000" rows="5" placeholder="e.g. how they always say good morning first" lang="ja"></textarea>
 
-      <label>日付（任意）
-        <input type="date" id="post-date" />
+      <label class="field-label" for="post-date">
+        <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-calendar"/></svg>
+        Date <span class="hint">optional</span>
       </label>
+      <input type="date" id="post-date" />
 
-      <label>写真（任意）
-        <input type="file" id="post-image" accept="image/png,image/jpeg,image/webp,image/gif" />
+      <label class="field-label" for="post-image">
+        <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-image-plus"/></svg>
+        Photo <span class="hint">optional</span>
       </label>
-      <img id="post-image-preview" class="image-preview hidden" alt="プレビュー" />
+      <input type="file" id="post-image" accept="image/png,image/jpeg,image/webp,image/gif" />
+      <img id="post-image-preview" class="image-preview hidden" alt="Selected photo preview" />
 
       <div class="post-actions">
-        <button type="submit" class="btn btn-primary" id="post-submit">カプセルに詰める</button>
-        <button type="button" class="btn btn-ghost hidden" id="post-cancel-edit">キャンセル</button>
+        <button type="submit" class="btn btn-primary" id="post-submit">Seal the Capsule</button>
+        <button type="button" class="btn btn-ghost hidden" id="post-cancel-edit">Cancel</button>
       </div>
-      <p class="auth-error" id="post-error"></p>
+      <p class="form-error" id="post-error" role="alert"></p>
     </form>
   </section>
 
   <!-- ===== LIST SCREEN ===== -->
-  <section id="screen-list" class="screen hidden">
+  <section id="screen-list" class="screen screen-list hidden">
     <header class="topbar">
-      <h1 class="logo small">好きなところ一覧</h1>
+      <h1 class="logo logo-sm">Your Capsules</h1>
     </header>
     <div id="list-empty" class="empty-state hidden">
-      <p>まだ好きなところがありません🌱</p>
-      <button class="btn btn-secondary" data-nav="post">最初のカプセルを作る</button>
+      <p>No capsules yet — start your collection.</p>
+      <button class="btn btn-secondary" data-nav="post">Add Your First Capsule</button>
     </div>
     <div id="list-grid" class="list-grid"></div>
   </section>
 
   <!-- ===== BOTTOM NAV ===== -->
-  <nav id="bottom-nav" class="bottom-nav hidden">
-    <button class="nav-btn active" data-nav="home"><span class="nav-icon">🎰</span><span>ホーム</span></button>
-    <button class="nav-btn" data-nav="post"><span class="nav-icon">✏️</span><span>投稿</span></button>
-    <button class="nav-btn" data-nav="list"><span class="nav-icon">📋</span><span>一覧</span></button>
+  <nav id="bottom-nav" class="bottom-nav hidden" aria-label="Primary">
+    <button class="nav-btn active" data-nav="home" aria-current="page">
+      <svg class="icon" aria-hidden="true"><use href="#icon-house"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" data-nav="post">
+      <svg class="icon" aria-hidden="true"><use href="#icon-pen"/></svg>
+      <span>Add</span>
+    </button>
+    <button class="nav-btn" data-nav="list">
+      <svg class="icon" aria-hidden="true"><use href="#icon-grid"/></svg>
+      <span>List</span>
+    </button>
   </nav>
 
 </div>

@@ -26,7 +26,7 @@
     let data = null;
     try { data = await res.json(); } catch (_) { /* no body */ }
     if (!res.ok) {
-      throw new Error((data && data.error) || `エラーが発生しました (${res.status})`);
+      throw new Error((data && data.error) || `Something went wrong (${res.status})`);
     }
     return data;
   }
@@ -199,10 +199,11 @@
     runGasha();
   });
 
+  const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
   function formatDate(str) {
     const d = new Date(str + (str.length <= 10 ? "T00:00:00" : ""));
     if (isNaN(d.getTime())) return str;
-    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+    return dateFormatter.format(d);
   }
 
   // ---------- post ----------
@@ -212,13 +213,13 @@
   function resetPostForm() {
     state.editingId = null;
     pendingImageKey = null;
-    $("#post-title").textContent = "好きなところを追加";
+    $("#post-title").textContent = "New Capsule";
     $("#post-text").value = "";
     $("#post-date").value = "";
     $("#post-image").value = "";
     $("#post-image-preview").classList.add("hidden");
     $("#post-image-preview").src = "";
-    $("#post-submit").textContent = "カプセルに詰める";
+    $("#post-submit").textContent = "Seal the Capsule";
     $("#post-cancel-edit").classList.add("hidden");
     $("#post-error").textContent = "";
   }
@@ -303,17 +304,17 @@
       card.className = "capsule-card";
 
       const img = capsule.image_key
-        ? `<img src="/api/images/${capsule.image_key}" alt="思い出の写真" />`
+        ? `<img src="/api/images/${capsule.image_key}" alt="Attached memory photo" />`
         : "";
       const dateStr = capsule.memo_date || capsule.created_at.slice(0, 10);
 
       card.innerHTML = `
         ${img}
         <div class="card-date">${formatDate(dateStr)}</div>
-        <div class="card-text"></div>
+        <div class="card-text" lang="ja"></div>
         <div class="card-actions">
-          <button data-action="edit">編集</button>
-          <button data-action="delete" class="danger">削除</button>
+          <button data-action="edit"><svg class="icon" aria-hidden="true"><use href="#icon-pen"/></svg>Edit</button>
+          <button data-action="delete" class="danger"><svg class="icon" aria-hidden="true"><use href="#icon-trash"/></svg>Delete</button>
         </div>
       `;
       card.querySelector(".card-text").textContent = capsule.text;
@@ -328,7 +329,7 @@
   function startEdit(capsule) {
     state.editingId = capsule.id;
     pendingImageKey = capsule.image_key || null;
-    $("#post-title").textContent = "カプセルを編集";
+    $("#post-title").textContent = "Edit Capsule";
     $("#post-text").value = capsule.text;
     $("#post-date").value = capsule.memo_date || "";
     $("#post-image").value = "";
@@ -338,14 +339,14 @@
     } else {
       $("#post-image-preview").classList.add("hidden");
     }
-    $("#post-submit").textContent = "更新する";
+    $("#post-submit").textContent = "Save Changes";
     $("#post-cancel-edit").classList.remove("hidden");
     $("#post-error").textContent = "";
     showScreen("post");
   }
 
   async function deleteCapsule(id) {
-    if (!confirm("このカプセルを削除しますか？")) return;
+    if (!confirm("Delete this capsule? This cannot be undone.")) return;
     try {
       await api(`/api/capsules/${id}`, { method: "DELETE" });
       await refreshList();
