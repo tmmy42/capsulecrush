@@ -49,22 +49,28 @@
       </div>
 
       <form id="form-login" class="auth-form">
-        <label class="field-label" for="login-username">Username</label>
-        <input type="text" id="login-username" autocomplete="username" required maxlength="32" />
-
-        <label class="field-label" for="login-passcode">Passcode</label>
-        <input type="password" id="login-passcode" autocomplete="current-password" required maxlength="64" />
+        <div class="field">
+          <label class="field-label" for="login-username">Username</label>
+          <input type="text" id="login-username" autocomplete="username" required maxlength="32" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="login-passcode">Passcode</label>
+          <input type="password" id="login-passcode" autocomplete="current-password" required maxlength="64" />
+        </div>
 
         <button type="submit" class="btn btn-primary btn-block">Log In</button>
         <p class="form-error" id="login-error" role="alert"></p>
       </form>
 
       <form id="form-signup" class="auth-form hidden">
-        <label class="field-label" for="signup-username">Username <span class="hint">letters, numbers, underscore · 3-32</span></label>
-        <input type="text" id="signup-username" autocomplete="username" required maxlength="32" />
-
-        <label class="field-label" for="signup-passcode">Passcode <span class="hint">4-64 characters</span></label>
-        <input type="password" id="signup-passcode" autocomplete="new-password" required maxlength="64" />
+        <div class="field">
+          <label class="field-label" for="signup-username">Username <span class="hint">letters, numbers, underscore · 3-32</span></label>
+          <input type="text" id="signup-username" autocomplete="username" required maxlength="32" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="signup-passcode">Passcode <span class="hint">4-64 characters</span></label>
+          <input type="password" id="signup-passcode" autocomplete="new-password" required maxlength="64" />
+        </div>
 
         <button type="submit" class="btn btn-primary btn-block">Get Started</button>
         <p class="form-error" id="signup-error" role="alert"></p>
@@ -82,32 +88,38 @@
     </header>
 
     <div class="gasha-stage">
-      <svg class="deco deco-star star-1" aria-hidden="true"><use href="#deco-star"/></svg>
       <div class="deco deco-dot dot-1" aria-hidden="true"></div>
       <div class="deco deco-dot dot-2" aria-hidden="true"></div>
       <svg class="deco deco-wave wave-1" aria-hidden="true"><use href="#deco-wave"/></svg>
-      <svg class="deco deco-star star-2" aria-hidden="true"><use href="#deco-star"/></svg>
 
       <div class="machine">
+        <svg class="deco deco-star ms-1" aria-hidden="true"><use href="#deco-star"/></svg>
+        <svg class="deco deco-star ms-2" aria-hidden="true"><use href="#deco-star"/></svg>
+        <svg class="deco deco-star ms-3" aria-hidden="true"><use href="#deco-star"/></svg>
+
         <div class="machine-dome">
+          <div class="dome-shine" aria-hidden="true"></div>
           <div class="machine-capsules">
             <span class="mini-capsule mc-1"></span>
             <span class="mini-capsule mc-2"></span>
             <span class="mini-capsule mc-3"></span>
             <span class="mini-capsule mc-4"></span>
             <span class="mini-capsule mc-5"></span>
+            <span class="mini-capsule mc-6"></span>
+            <span class="mini-capsule mc-7"></span>
+            <span class="mini-capsule mc-8"></span>
           </div>
         </div>
         <div class="machine-body">
-          <div class="machine-window"></div>
-          <div class="machine-slot"></div>
-        </div>
-        <div class="machine-base">
+          <div class="coin-slot"></div>
           <div class="lever-wrap">
-            <div id="lever" class="lever">
-              <div class="lever-knob"></div>
+            <div id="lever" class="dial">
+              <div class="dial-grip"></div>
             </div>
           </div>
+        </div>
+        <div class="machine-chute">
+          <div class="chute-opening"></div>
         </div>
       </div>
 
@@ -152,21 +164,27 @@
     </header>
 
     <form id="form-post" class="post-form">
-      <label class="field-label" for="post-text">What you love <span class="req">Required</span></label>
-      <textarea id="post-text" required maxlength="2000" rows="5" placeholder="e.g. how they always say good morning first" lang="ja"></textarea>
+      <div class="field">
+        <label class="field-label" for="post-text">What you love <span class="req">Required</span></label>
+        <textarea id="post-text" required maxlength="2000" rows="5" placeholder="e.g. how they always say good morning first" lang="ja"></textarea>
+      </div>
 
-      <label class="field-label" for="post-date">
-        <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-calendar"/></svg>
-        Date <span class="hint">optional</span>
-      </label>
-      <input type="date" id="post-date" />
+      <div class="field">
+        <label class="field-label" for="post-date">
+          <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-calendar"/></svg>
+          Date <span class="hint">optional</span>
+        </label>
+        <input type="date" id="post-date" />
+      </div>
 
-      <label class="field-label" for="post-image">
-        <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-image-plus"/></svg>
-        Photo <span class="hint">optional</span>
-      </label>
-      <input type="file" id="post-image" accept="image/png,image/jpeg,image/webp,image/gif" />
-      <img id="post-image-preview" class="image-preview hidden" alt="Selected photo preview" />
+      <div class="field">
+        <label class="field-label" for="post-image">
+          <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-image-plus"/></svg>
+          Photo <span class="hint">optional</span>
+        </label>
+        <input type="file" id="post-image" accept="image/png,image/jpeg,image/webp,image/gif" />
+        <img id="post-image-preview" class="image-preview hidden" alt="Selected photo preview" />
+      </div>
 
       <div class="post-actions">
         <button type="submit" class="btn btn-primary" id="post-submit">Seal the Capsule</button>
