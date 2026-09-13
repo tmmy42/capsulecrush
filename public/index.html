@@ -144,65 +144,54 @@
 
         <!-- part: dome (static) -->
         <g class="machine-part machine-part-dome">
-          <circle cx="110" cy="116" r="90" fill="url(#grad-dome-glass)" stroke="#1A1A1A" stroke-width="1.6"/>
+          <circle cx="110" cy="116" r="90" fill="url(#grad-dome-glass)" stroke="#1A1A1A" stroke-width="2.6"/>
           <ellipse cx="76" cy="62" rx="18" ry="34" fill="#fff" opacity=".5" transform="rotate(-16 76 62)"/>
-          <path d="M84,24 C84,10 96,4 110,4 C124,4 136,10 136,24 Z" fill="url(#grad-cap)" stroke="#1A1A1A" stroke-width="1.6"/>
+          <path d="M84,24 C84,10 96,4 110,4 C124,4 136,10 136,24 Z" fill="url(#grad-cap)" stroke="#1A1A1A" stroke-width="2.6"/>
         </g>
 
-        <!-- part: capsules piled inside the dome (static) — denser/larger
-             lower down, sparser/smaller near the top; later balls overlap
-             earlier ones so the pile reads with real front-to-back depth -->
+        <!-- part: capsules piled inside the dome (static) — a small, loose
+             cluster of six same-size balls near the bottom of the dome, not
+             packed edge-to-edge; later balls overlap earlier ones so the
+             pile still reads with a little front-to-back depth -->
         <g class="machine-part machine-part-capsules" clip-path="url(#dome-clip)">
-          <circle cx="92" cy="121" r="12" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.1"/>
-          <circle cx="128" cy="118" r="11" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.1"/>
-          <circle cx="110" cy="134" r="10" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.1"/>
+          <circle cx="88" cy="140" r="16" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="132" cy="138" r="16" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="66" cy="170" r="16" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="110" cy="172" r="16" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="154" cy="168" r="16" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="110" cy="200" r="16" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
 
-          <circle cx="78" cy="148" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.2"/>
-          <circle cx="142" cy="146" r="14" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.2"/>
-          <circle cx="110" cy="158" r="13" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.2"/>
-
-          <circle cx="62" cy="174" r="17" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.3"/>
-          <circle cx="96" cy="178" r="17" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.3"/>
-          <circle cx="130" cy="176" r="16" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.3"/>
-          <circle cx="158" cy="172" r="14" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.3"/>
-
-          <circle cx="80" cy="196" r="17" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.3"/>
-          <circle cx="114" cy="198" r="18" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.3"/>
-          <circle cx="146" cy="194" r="16" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.3"/>
-
-          <ellipse cx="87" cy="117" rx="3.5" ry="4.5" fill="#fff" opacity=".85"/>
-          <ellipse cx="123" cy="114" rx="3" ry="4" fill="#fff" opacity=".85"/>
-          <ellipse cx="72" cy="143" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-          <ellipse cx="136" cy="141" rx="4" ry="5.5" fill="#fff" opacity=".85"/>
-          <ellipse cx="56" cy="168" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
-          <ellipse cx="90" cy="172" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
-          <ellipse cx="124" cy="170" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-          <ellipse cx="74" cy="190" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
-          <ellipse cx="107" cy="191" rx="5.5" ry="7" fill="#fff" opacity=".85"/>
-          <ellipse cx="140" cy="187" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
+          <ellipse cx="83" cy="136" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+          <ellipse cx="127" cy="134" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+          <ellipse cx="61" cy="166" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+          <ellipse cx="105" cy="168" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+          <ellipse cx="149" cy="164" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+          <ellipse cx="105" cy="196" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
         </g>
 
         <!-- part: trim / coin plate (static) -->
         <g class="machine-part machine-part-trim">
-          <rect x="24" y="200" width="172" height="20" rx="10" fill="url(#grad-machine-trim)" stroke="#1A1A1A" stroke-width="1.6"/>
+          <rect x="24" y="200" width="172" height="20" rx="10" fill="url(#grad-machine-trim)" stroke="#1A1A1A" stroke-width="2.6"/>
           <rect x="100" y="206" width="20" height="7" rx="3" fill="#1A1A1A" opacity=".7"/>
         </g>
 
         <!-- part: body (static) -->
         <g class="machine-part machine-part-body">
-          <rect x="28" y="214" width="164" height="66" rx="16" fill="url(#grad-machine-body)" stroke="#1A1A1A" stroke-width="1.6"/>
+          <rect x="28" y="214" width="164" height="66" rx="16" fill="url(#grad-machine-body)" stroke="#1A1A1A" stroke-width="2.6"/>
         </g>
 
-        <!-- part: base (static) -->
+        <!-- part: base (static) — a trapezoid that flares outward toward
+             the bottom, per the reference illustration, rather than a
+             rounded bar -->
         <g class="machine-part machine-part-base">
-          <rect x="14" y="274" width="192" height="20" rx="10" fill="url(#grad-machine-base)" stroke="#1A1A1A" stroke-width="1.6"/>
+          <polygon points="40,274 180,274 206,294 14,294" fill="url(#grad-machine-base)" stroke="#1A1A1A" stroke-width="2.6" stroke-linejoin="round"/>
         </g>
 
         <!-- part: dial / knob — the ONLY part that moves. transform-origin
              is the dial's own center, so pulling the gasha spins just this
              group while the dome/body/base stay put. -->
         <g id="lever" class="machine-part machine-part-dial">
-          <circle cx="110" cy="246" r="22" fill="url(#grad-dial)" stroke="#1A1A1A" stroke-width="1.5"/>
+          <circle cx="110" cy="246" r="22" fill="url(#grad-dial)" stroke="#1A1A1A" stroke-width="2.4"/>
           <rect x="98" y="243.5" width="24" height="5" rx="2.5" fill="#1A1A1A" opacity=".8"/>
         </g>
       </svg>

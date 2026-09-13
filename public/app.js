@@ -63,7 +63,7 @@
     $("#home-subtitle").textContent = `Favorite things about ${name}`;
     $("#post-text-label").textContent = `What you love about ${name}`;
     $("#list-title").textContent = `${name}'s Capsules`;
-    const emptyText = `No favorite things about ${name} yet — start the collection.`;
+    const emptyText = `What do you love about ${name}? — Start the collection.`;
     $("#empty-state-text").textContent = emptyText;
     $("#list-empty-text").textContent = emptyText;
   }

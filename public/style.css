@@ -95,8 +95,8 @@ body {
   z-index: 100;
   pointer-events: none;
   background-image: url('grain.svg');
-  background-size: 160px 160px;
-  opacity: .05;
+  background-size: 110px 110px;
+  opacity: .16;
   mix-blend-mode: multiply;
 }
 
@@ -154,7 +154,7 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 
 .home-subtitle {
   text-align: center;
-  margin: var(--space-1) 0 0;
+  margin: var(--space-5) 0 0;
   font-size: .95rem;
   font-weight: 500;
   color: var(--color-ink-soft);
