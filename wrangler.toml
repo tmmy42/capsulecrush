@@ -1,0 +1,15 @@
+name = "capsulecrush"
+main = "src/index.js"
+compatibility_date = "2025-08-01"
+
+[assets]
+directory = "./public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "capsulecrush-db"
+database_id = "1873b2f2-34b9-4099-85fa-cc2d2e4a0998"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "capsulecrush-images"

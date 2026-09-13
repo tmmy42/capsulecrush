@@ -1,0 +1,23 @@
+{
+  "name": "capsulecrush",
+  "version": "1.0.0",
+  "description": "恋人の好きなところをカプセルに詰めてガシャポンで楽しむアプリ",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:init": "wrangler d1 execute capsulecrush-db --remote --file=schema.sql",
+    "db:init:local": "wrangler d1 execute capsulecrush-db --local --file=schema.sql"
+  },
+  "keywords": ["cloudflare", "workers", "hono", "d1", "r2"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "wrangler": "^4.131.1"
+  }
+}

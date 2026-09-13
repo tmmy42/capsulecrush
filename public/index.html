@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>CapsuleCrush</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <section id="screen-auth" class="screen">
+    <div class="auth-card">
+      <h1 class="logo">CapsuleCrush</h1>
+      <p class="tagline">好きなところをカプセルに詰めよう💗</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">ログイン</button>
+        <button class="auth-tab" data-tab="signup">新規登録</button>
+      </div>
+
+      <form id="form-login" class="auth-form">
+        <label>ユーザー名
+          <input type="text" id="login-username" autocomplete="username" required maxlength="32" />
+        </label>
+        <label>パスコード
+          <input type="password" id="login-passcode" autocomplete="current-password" required maxlength="64" />
+        </label>
+        <button type="submit" class="btn btn-primary">ログイン</button>
+        <p class="auth-error" id="login-error"></p>
+      </form>
+
+      <form id="form-signup" class="auth-form hidden">
+        <label>ユーザー名（英数字・アンダースコア、3〜32文字）
+          <input type="text" id="signup-username" autocomplete="username" required maxlength="32" />
+        </label>
+        <label>パスコード（4〜64文字）
+          <input type="password" id="signup-passcode" autocomplete="new-password" required maxlength="64" />
+        </label>
+        <button type="submit" class="btn btn-primary">はじめる</button>
+        <p class="auth-error" id="signup-error"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== HOME (GASHAPON) SCREEN ===== -->
+  <section id="screen-home" class="screen hidden">
+    <header class="topbar">
+      <h1 class="logo small">CapsuleCrush</h1>
+      <button id="btn-logout" class="btn-icon" title="ログアウト">⎋</button>
+    </header>
+
+    <div class="gasha-stage">
+      <div class="deco star star-1">★</div>
+      <div class="deco dot dot-1"></div>
+      <div class="deco dot dot-2"></div>
+      <div class="deco wave wave-1">〜</div>
+      <div class="deco star star-2">★</div>
+
+      <div class="machine">
+        <div class="machine-dome">
+          <div class="machine-capsules">
+            <span class="mini-capsule mc-1"></span>
+            <span class="mini-capsule mc-2"></span>
+            <span class="mini-capsule mc-3"></span>
+            <span class="mini-capsule mc-4"></span>
+            <span class="mini-capsule mc-5"></span>
+          </div>
+        </div>
+        <div class="machine-body">
+          <div class="machine-window"></div>
+          <div class="machine-slot"></div>
+        </div>
+        <div class="machine-base">
+          <div class="lever-wrap">
+            <div id="lever" class="lever">
+              <div class="lever-knob"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="falling-capsule" class="falling-capsule hidden">
+        <div class="capsule-top"></div>
+        <div class="capsule-bottom"></div>
+      </div>
+
+      <button id="btn-gasha" class="btn btn-gasha">レバーを引く 🎰</button>
+    </div>
+
+    <div id="empty-state" class="empty-state hidden">
+      <p>まだ好きなところが貯まっていません🌱</p>
+      <button class="btn btn-secondary" data-nav="post">最初のカプセルを作る</button>
+    </div>
+
+    <!-- Result modal -->
+    <div id="result-modal" class="modal hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="result-close">×</button>
+        <div class="capsule-open-icon">💌</div>
+        <p class="result-date" id="result-date"></p>
+        <p class="result-text" id="result-text"></p>
+        <img id="result-image" class="result-image hidden" alt="思い出の写真" />
+        <button class="btn btn-primary" id="result-again">もう一回引く</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== POST SCREEN ===== -->
+  <section id="screen-post" class="screen hidden">
+    <header class="topbar">
+      <h1 class="logo small" id="post-title">好きなところを追加</h1>
+    </header>
+
+    <form id="form-post" class="post-form">
+      <label>好きなところ <span class="req">必須</span>
+        <textarea id="post-text" required maxlength="2000" rows="5" placeholder="例）朝いちばんに『おはよう』って連絡くれるところ"></textarea>
+      </label>
+
+      <label>日付（任意）
+        <input type="date" id="post-date" />
+      </label>
+
+      <label>写真（任意）
+        <input type="file" id="post-image" accept="image/png,image/jpeg,image/webp,image/gif" />
+      </label>
+      <img id="post-image-preview" class="image-preview hidden" alt="プレビュー" />
+
+      <div class="post-actions">
+        <button type="submit" class="btn btn-primary" id="post-submit">カプセルに詰める</button>
+        <button type="button" class="btn btn-ghost hidden" id="post-cancel-edit">キャンセル</button>
+      </div>
+      <p class="auth-error" id="post-error"></p>
+    </form>
+  </section>
+
+  <!-- ===== LIST SCREEN ===== -->
+  <section id="screen-list" class="screen hidden">
+    <header class="topbar">
+      <h1 class="logo small">好きなところ一覧</h1>
+    </header>
+    <div id="list-empty" class="empty-state hidden">
+      <p>まだ好きなところがありません🌱</p>
+      <button class="btn btn-secondary" data-nav="post">最初のカプセルを作る</button>
+    </div>
+    <div id="list-grid" class="list-grid"></div>
+  </section>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav id="bottom-nav" class="bottom-nav hidden">
+    <button class="nav-btn active" data-nav="home"><span class="nav-icon">🎰</span><span>ホーム</span></button>
+    <button class="nav-btn" data-nav="post"><span class="nav-icon">✏️</span><span>投稿</span></button>
+    <button class="nav-btn" data-nav="list"><span class="nav-icon">📋</span><span>一覧</span></button>
+  </nav>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
