@@ -125,6 +125,15 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
   flex-shrink: 0;
 }
 .icon-inline { width: 16px; height: 16px; vertical-align: -3px; margin-right: 2px; }
+.icon-heart {
+  width: 14px;
+  height: 14px;
+  margin: 0 0 0 3px;
+  fill: var(--color-primary);
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  vertical-align: -1px;
+}
 
 /* Decorative motifs — exactly two shapes (sparkle + dot), styled with the
    same hairline stroke weight and soft shadow as the machine illustration
@@ -323,7 +332,7 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 .req { color: var(--color-error); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-style: normal; }
 .hint { color: var(--color-ink-soft); font-size: .75rem; font-weight: 400; }
 
-input[type="text"], input[type="password"], input[type="date"], textarea {
+input[type="text"], input[type="password"], input[type="date"], input[type="file"], textarea {
   font-family: var(--font-body);
   font-style: italic;
   font-size: 1rem;

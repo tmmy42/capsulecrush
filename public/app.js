@@ -72,11 +72,11 @@
     const name = state.partnerName || "them";
     const n = nameSpan(name);
     $("#home-subtitle").innerHTML = `Favorite things about ${n}`;
-    $("#post-text-label").innerHTML = `What you love about ${n}`;
+    $("#post-text-label").innerHTML = `What do you love about ${n}?`;
     $("#list-title").innerHTML = `${n}'s Capsules`;
-    const emptyText = `What do you love about ${n}? — Start the collection.`;
-    $("#empty-state-text").innerHTML = emptyText;
-    $("#list-empty-text").innerHTML = emptyText;
+    const heart = `<svg class="icon icon-inline icon-heart" aria-hidden="true"><use href="#icon-heart"/></svg>`;
+    $("#empty-state-text").innerHTML = `What do you love about ${n}? — Start the collection. ${heart}`;
+    $("#list-empty-text").innerHTML = `What do you love about ${n}? — Start the collection.`;
   }
 
   $("#form-login").addEventListener("submit", async (e) => {
