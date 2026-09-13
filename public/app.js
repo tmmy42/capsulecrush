@@ -64,14 +64,19 @@
     return div.innerHTML;
   }
 
+  function nameSpan(name) {
+    return `<span class="partner-name">${escapeHtml(name)}</span>`;
+  }
+
   function applyPersonalization() {
     const name = state.partnerName || "them";
-    $("#home-subtitle").innerHTML = `Favorite things about <span class="subtitle-name">${escapeHtml(name)}</span>`;
-    $("#post-text-label").textContent = `What you love about ${name}`;
-    $("#list-title").textContent = `${name}'s Capsules`;
-    const emptyText = `What do you love about ${name}? — Start the collection.`;
-    $("#empty-state-text").textContent = emptyText;
-    $("#list-empty-text").textContent = emptyText;
+    const n = nameSpan(name);
+    $("#home-subtitle").innerHTML = `Favorite things about ${n}`;
+    $("#post-text-label").innerHTML = `What you love about ${n}`;
+    $("#list-title").innerHTML = `${n}'s Capsules`;
+    const emptyText = `What do you love about ${n}? — Start the collection.`;
+    $("#empty-state-text").innerHTML = emptyText;
+    $("#list-empty-text").innerHTML = emptyText;
   }
 
   $("#form-login").addEventListener("submit", async (e) => {
@@ -238,7 +243,7 @@
   function resetPostForm() {
     state.editingId = null;
     pendingImageKey = null;
-    $("#post-title").textContent = `New Capsule for ${state.partnerName || "them"}`;
+    $("#post-title").innerHTML = `New Capsule for ${nameSpan(state.partnerName || "them")}`;
     $("#post-text").value = "";
     $("#post-date").value = "";
     $("#post-image").value = "";
@@ -354,7 +359,7 @@
   function startEdit(capsule) {
     state.editingId = capsule.id;
     pendingImageKey = capsule.image_key || null;
-    $("#post-title").textContent = `Edit Capsule for ${state.partnerName || "them"}`;
+    $("#post-title").innerHTML = `Edit Capsule for ${nameSpan(state.partnerName || "them")}`;
     $("#post-text").value = capsule.text;
     $("#post-date").value = capsule.memo_date || "";
     $("#post-image").value = "";

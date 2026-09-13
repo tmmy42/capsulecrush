@@ -158,7 +158,10 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
   font-weight: 500;
   color: var(--color-ink-soft);
 }
-.home-subtitle .subtitle-name {
+/* Applied everywhere the registered partner name is interpolated into
+   UI copy (home subtitle, screen titles, field labels, empty states) so
+   it's consistently highlighted, not just on the home screen */
+.partner-name {
   color: var(--color-primary);
   font-weight: 700;
 }
