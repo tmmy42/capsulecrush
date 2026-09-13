@@ -218,7 +218,7 @@ app.delete("/api/capsules/:id", requireAuth, async (c) => {
     .bind(id, userId)
     .run();
 
-  if (existing.image_key) {
+  if (existing.image_key && c.env.IMAGES) {
     await c.env.IMAGES.delete(existing.image_key).catch(() => {});
   }
 
@@ -235,6 +235,9 @@ const ALLOWED_IMAGE_TYPES = {
 };
 
 app.post("/api/upload", requireAuth, async (c) => {
+  if (!c.env.IMAGES) {
+    return c.json({ error: "画像機能は現在準備中です" }, 503);
+  }
   const userId = c.get("userId");
   const formData = await c.req.formData().catch(() => null);
   const file = formData?.get("image");
@@ -259,6 +262,7 @@ app.post("/api/upload", requireAuth, async (c) => {
 });
 
 app.get("/api/images/:key{.+}", async (c) => {
+  if (!c.env.IMAGES) return c.notFound();
   const key = c.req.param("key");
   const object = await c.env.IMAGES.get(key);
   if (!object) return c.notFound();

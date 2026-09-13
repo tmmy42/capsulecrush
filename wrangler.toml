@@ -10,6 +10,9 @@ binding = "DB"
 database_name = "capsulecrush-db"
 database_id = "1873b2f2-34b9-4099-85fa-cc2d2e4a0998"
 
-[[r2_buckets]]
-binding = "IMAGES"
-bucket_name = "capsulecrush-images"
+# R2 bucket not yet enabled on the Cloudflare account.
+# Once enabled, create the bucket and uncomment this block, then redeploy:
+#   npx wrangler r2 bucket create capsulecrush-images
+# [[r2_buckets]]
+# binding = "IMAGES"
+# bucket_name = "capsulecrush-images"
