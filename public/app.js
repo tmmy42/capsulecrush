@@ -75,8 +75,8 @@
     $("#post-text-label").innerHTML = `What do you love about ${n}?`;
     $("#list-title").innerHTML = `${n}'s Capsules`;
     const heart = `<svg class="icon icon-inline icon-heart" aria-hidden="true"><use href="#icon-heart"/></svg>`;
-    $("#empty-state-text").innerHTML = `What do you love about ${n}? — Start the collection. ${heart}`;
-    $("#list-empty-text").innerHTML = `What do you love about ${n}? — Start the collection.`;
+    $("#empty-state-text").innerHTML = `What do you love about ${n}? — Start the collection ${heart}`;
+    $("#list-empty-text").innerHTML = `What do you love about ${n}? — Start the collection`;
   }
 
   $("#form-login").addEventListener("submit", async (e) => {
@@ -247,6 +247,7 @@
     $("#post-text").value = "";
     $("#post-date").value = "";
     $("#post-image").value = "";
+    $("#post-image-filename").textContent = "No file chosen";
     $("#post-image-preview").classList.add("hidden");
     $("#post-image-preview").src = "";
     $("#post-submit").textContent = "Seal the Capsule";
@@ -256,6 +257,7 @@
 
   $("#post-image").addEventListener("change", () => {
     const file = $("#post-image").files[0];
+    $("#post-image-filename").textContent = file ? file.name : "No file chosen";
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
@@ -363,6 +365,7 @@
     $("#post-text").value = capsule.text;
     $("#post-date").value = capsule.memo_date || "";
     $("#post-image").value = "";
+    $("#post-image-filename").textContent = "No file chosen";
     if (capsule.image_key) {
       $("#post-image-preview").src = `/api/images/${capsule.image_key}`;
       $("#post-image-preview").classList.remove("hidden");

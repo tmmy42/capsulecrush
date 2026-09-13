@@ -98,12 +98,6 @@
       <!-- Decorative motifs: two shapes only (sparkle + dot), placed along a
            loose arc around the machine with deliberately uneven size/angle,
            some tucked behind the machine so the scene reads as one composition -->
-      <svg class="deco deco-star ms-1" aria-hidden="true"><use href="#deco-star"/></svg>
-      <svg class="deco deco-dot ms-2" aria-hidden="true"><use href="#deco-dot"/></svg>
-      <svg class="deco deco-star ms-3" aria-hidden="true"><use href="#deco-star"/></svg>
-      <svg class="deco deco-dot ms-4" aria-hidden="true"><use href="#deco-dot"/></svg>
-      <svg class="deco deco-star ms-5" aria-hidden="true"><use href="#deco-star"/></svg>
-
       <!-- Gashapon machine: one continuous outer silhouette (cap, gummy-round
            dome, neck, trapezoid body, trapezoid base all share a single
            traced outline — no independent per-part outlines) recolored in
@@ -161,8 +155,8 @@
             <stop offset="100%" stop-color="#FF5FA0"/>
           </linearGradient>
           <linearGradient id="grad-machine-base" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#FF7FC4"/>
-            <stop offset="100%" stop-color="#9B6FEF"/>
+            <stop offset="0%" stop-color="#FFA8D0"/>
+            <stop offset="100%" stop-color="#FF5FA0"/>
           </linearGradient>
           <radialGradient id="grad-dial" cx="34%" cy="28%" r="80%">
             <stop offset="0%" stop-color="#FFFFFF"/>
@@ -194,12 +188,12 @@
             <circle cx="85" cy="103" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
             <circle cx="128" cy="100" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
             <circle cx="102" cy="78" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
-            <ellipse cx="73" cy="125" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="103" cy="125" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="131" cy="125" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="80" cy="99" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="123" cy="96" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="97" cy="74" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <circle cx="73" cy="125" r="4.6" fill="#fff" opacity=".85"/>
+            <circle cx="103" cy="125" r="4.6" fill="#fff" opacity=".85"/>
+            <circle cx="131" cy="125" r="4.6" fill="#fff" opacity=".85"/>
+            <circle cx="80" cy="99" r="4.6" fill="#fff" opacity=".85"/>
+            <circle cx="123" cy="96" r="4.6" fill="#fff" opacity=".85"/>
+            <circle cx="97" cy="74" r="4.6" fill="#fff" opacity=".85"/>
           </g>
         </g>
 
@@ -234,7 +228,7 @@
 
     <div id="empty-state" class="empty-state hidden">
       <p id="empty-state-text">No capsules yet — start your collection.</p>
-      <button class="btn btn-secondary" data-nav="post">Add Your First Capsule</button>
+      <button class="btn btn-secondary" data-nav="post">Add Your First Capsule!!</button>
     </div>
 
     <!-- Result modal -->
@@ -280,7 +274,11 @@
           <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-image-plus"/></svg>
           Photo <span class="hint">optional</span>
         </label>
-        <input type="file" id="post-image" accept="image/png,image/jpeg,image/webp,image/gif" />
+        <div class="file-field">
+          <label class="file-trigger" for="post-image">Choose File</label>
+          <span class="file-name" id="post-image-filename">No file chosen</span>
+          <input type="file" id="post-image" class="file-input-hidden" accept="image/png,image/jpeg,image/webp,image/gif" />
+        </div>
         <img id="post-image-preview" class="image-preview hidden" alt="Selected photo preview" />
       </div>
 
@@ -299,7 +297,7 @@
     </header>
     <div id="list-empty" class="empty-state hidden">
       <p id="list-empty-text">No capsules yet — start your collection.</p>
-      <button class="btn btn-secondary" data-nav="post">Add Your First Capsule</button>
+      <button class="btn btn-secondary" data-nav="post">Add Your First Capsule!!</button>
     </div>
     <div id="list-grid" class="list-grid"></div>
   </section>
