@@ -128,7 +128,7 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 .icon-heart {
   width: 20px;
   height: 20px;
-  margin: 0 0 0 4px;
+  margin: 0 0 0 1px;
   fill: var(--color-primary);
   stroke: var(--color-ink);
   stroke-width: 1.5;
