@@ -158,6 +158,10 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
   font-weight: 500;
   color: var(--color-ink-soft);
 }
+.home-subtitle .subtitle-name {
+  color: var(--color-primary);
+  font-weight: 700;
+}
 
 .tagline {
   text-align: center;
@@ -199,24 +203,22 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 .btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
 .btn-secondary { background: var(--color-secondary); color: var(--color-on-secondary); }
 .btn-ghost { background: var(--color-surface); }
-/* Gasha CTA and the home/list empty-state action are intentionally
-   smaller than a typical primary button — the gashapon illustration is
-   the star of this screen, buttons are supporting cast */
+/* Gasha CTA and the home/list empty-state action stay a touch smaller
+   than a full primary button (the gashapon illustration is the star of
+   this screen) but share one consistent height between them */
+.btn-gasha,
+.empty-state .btn {
+  font-size: 1rem;
+  padding: 13px 24px;
+  min-height: 48px;
+}
 .btn-gasha {
   background: var(--color-support);
   color: var(--color-on-support);
-  font-size: .95rem;
-  padding: 11px 22px;
-  min-height: 44px;
   margin-top: var(--space-3);
   box-shadow: var(--elev-3);
 }
 .btn-gasha:active { box-shadow: var(--elev-1); }
-.empty-state .btn {
-  font-size: .88rem;
-  padding: 10px 20px;
-  min-height: 42px;
-}
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 
 .icon-btn {

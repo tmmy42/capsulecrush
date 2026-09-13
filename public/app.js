@@ -58,9 +58,15 @@
     showScreen("home");
   }
 
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
   function applyPersonalization() {
     const name = state.partnerName || "them";
-    $("#home-subtitle").textContent = `Favorite things about ${name}`;
+    $("#home-subtitle").innerHTML = `Favorite things about <span class="subtitle-name">${escapeHtml(name)}</span>`;
     $("#post-text-label").textContent = `What you love about ${name}`;
     $("#list-title").textContent = `${name}'s Capsules`;
     const emptyText = `What do you love about ${name}? — Start the collection.`;
