@@ -95,9 +95,8 @@ body {
   z-index: 100;
   pointer-events: none;
   background-image: url('grain.svg');
-  background-size: 110px 110px;
-  opacity: .16;
-  mix-blend-mode: multiply;
+  background-size: 130px 130px;
+  mix-blend-mode: overlay;
 }
 
 #app {
