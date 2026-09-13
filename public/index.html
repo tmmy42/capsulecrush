@@ -154,10 +154,6 @@
             <stop offset="55%" stop-color="#FFB84D"/>
             <stop offset="100%" stop-color="#FF5FA0"/>
           </linearGradient>
-          <linearGradient id="grad-machine-base" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#FFA8D0"/>
-            <stop offset="100%" stop-color="#FF5FA0"/>
-          </linearGradient>
           <radialGradient id="grad-dial" cx="34%" cy="28%" r="80%">
             <stop offset="0%" stop-color="#FFFFFF"/>
             <stop offset="100%" stop-color="#E3E3DC"/>
@@ -167,11 +163,15 @@
         <ellipse class="machine-shadow" cx="110" cy="256" rx="80" ry="7"/>
 
         <g clip-path="url(#machine-silhouette)">
-          <g clip-path="url(#band-base)"><rect width="220" height="280" fill="url(#grad-machine-base)"/></g>
+          <!-- base reuses the exact same gradient element as the cap
+               (grad-cap), each sized to its own band's true height so
+               both render the identical light->dark pink sweep instead
+               of two different-looking slices of one shared gradient -->
+          <g clip-path="url(#band-base)"><rect x="0" y="230" width="220" height="26" fill="url(#grad-cap)"/></g>
           <g clip-path="url(#band-body)"><rect width="220" height="280" fill="url(#grad-machine-body)"/></g>
           <g clip-path="url(#band-trim)"><rect width="220" height="280" fill="url(#grad-machine-trim)"/></g>
           <g clip-path="url(#band-dome)"><rect width="220" height="280" fill="url(#grad-dome-glass)"/></g>
-          <g clip-path="url(#band-cap)"><rect width="220" height="280" fill="url(#grad-cap)"/></g>
+          <g clip-path="url(#band-cap)"><rect x="0" y="0" width="220" height="34" fill="url(#grad-cap)"/></g>
 
           <rect x="100" y="147" width="20" height="7" rx="3" fill="#1A1A1A" opacity=".7"/>
           <rect x="80" y="240" width="60" height="12" rx="6" fill="#1A1A1A" opacity=".22"/>
@@ -184,7 +184,7 @@
           <g clip-path="url(#dome-clip)">
             <circle cx="78" cy="129" r="15" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="2"/>
             <circle cx="108" cy="129" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
-            <circle cx="136" cy="129" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="136" cy="129" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
             <circle cx="85" cy="103" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
             <circle cx="128" cy="100" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
             <circle cx="102" cy="78" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>

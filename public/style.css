@@ -126,13 +126,13 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 }
 .icon-inline { width: 16px; height: 16px; vertical-align: -3px; margin-right: 2px; }
 .icon-heart {
-  width: 14px;
-  height: 14px;
-  margin: 0 0 0 3px;
+  width: 20px;
+  height: 20px;
+  margin: 0 0 0 4px;
   fill: var(--color-primary);
   stroke: var(--color-ink);
   stroke-width: 1.5;
-  vertical-align: -1px;
+  vertical-align: -4px;
 }
 
 /* Decorative motifs — exactly two shapes (sparkle + dot), styled with the
