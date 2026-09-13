@@ -111,26 +111,32 @@
       <svg class="machine" viewBox="0 0 220 280" aria-hidden="true">
         <defs>
           <path id="machine-outline" d="
-            M110,6
-            C132,6 148,10 153,34
+            M110,12
+            C140,12 152,22 153,34
             C171.37,47.62 182,69.2 182,92
             C182,111.58 174.14,130.40 160,144
-            L160,158
-            L176,230
-            L188,254
-            L32,254
-            L44,230
-            L60,158
+            L160,152
+            Q160,158 161.30,163.86
+            L174.05,221.21
+            Q176,230 180.02,238.05
+            L183.98,245.95
+            Q188,254 179,254
+            L41,254
+            Q32,254 36.02,245.95
+            L39.98,238.05
+            Q44,230 45.95,221.21
+            L58.70,163.86
+            Q60,158 60,152
             L60,144
             C45.86,130.40 38,111.58 38,92
             C38,69.2 48.63,47.62 67,34
-            C72,10 88,6 110,6
+            C68,22 80,12 110,12
             Z"/>
           <clipPath id="machine-silhouette"><use href="#machine-outline"/></clipPath>
           <clipPath id="dome-clip"><circle cx="110" cy="92" r="68"/></clipPath>
 
-          <clipPath id="band-cap"><rect x="0" y="0" width="220" height="20"/></clipPath>
-          <clipPath id="band-dome"><rect x="0" y="20" width="220" height="124"/></clipPath>
+          <clipPath id="band-cap"><rect x="0" y="0" width="220" height="27"/></clipPath>
+          <clipPath id="band-dome"><rect x="0" y="27" width="220" height="117"/></clipPath>
           <clipPath id="band-trim"><rect x="0" y="144" width="220" height="14"/></clipPath>
           <clipPath id="band-body"><rect x="0" y="158" width="220" height="72"/></clipPath>
           <clipPath id="band-base"><rect x="0" y="230" width="220" height="50"/></clipPath>
@@ -163,7 +169,7 @@
           </radialGradient>
         </defs>
 
-        <ellipse class="machine-shadow" cx="110" cy="272" rx="86" ry="7"/>
+        <ellipse class="machine-shadow" cx="110" cy="256" rx="80" ry="7"/>
 
         <g clip-path="url(#machine-silhouette)">
           <g clip-path="url(#band-base)"><rect width="220" height="280" fill="url(#grad-machine-base)"/></g>
@@ -179,22 +185,23 @@
           <rect x="100" y="147" width="20" height="7" rx="3" fill="#1A1A1A" opacity=".7"/>
           <rect x="80" y="240" width="60" height="12" rx="6" fill="#1A1A1A" opacity=".22"/>
 
-          <!-- candy pile: a loose cluster of six same-size balls, denser
-               toward the bottom of the dome; later balls overlap earlier
-               ones so the pile keeps a little front-to-back depth -->
+          <!-- candy pile: a tetrahedral stack (3 resting on the dome floor,
+               2 nestled above them, 1 on top) so every ball is tangent to
+               at least one neighbor — a real "piled up under gravity" look,
+               fully inside the dome-clip circle with margin to spare -->
           <g clip-path="url(#dome-clip)">
-            <circle cx="86" cy="98" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
-            <circle cx="130" cy="96" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
-            <circle cx="64" cy="126" r="15" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="2"/>
-            <circle cx="108" cy="128" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
-            <circle cx="152" cy="124" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
-            <circle cx="108" cy="152" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
-            <ellipse cx="81" cy="94" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="125" cy="92" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="59" cy="122" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="103" cy="124" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="147" cy="120" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="103" cy="148" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <circle cx="80" cy="132" r="15" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="110" cy="132" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="140" cy="132" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="95" cy="106" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="125" cy="106" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="110" cy="80" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
+            <ellipse cx="75" cy="128" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="105" cy="128" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="135" cy="128" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="90" cy="102" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="120" cy="102" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="105" cy="76" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
           </g>
         </g>
 
