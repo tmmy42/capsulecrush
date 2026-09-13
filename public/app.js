@@ -149,6 +149,7 @@
   const lever = $("#lever");
   const fallingCapsule = $("#falling-capsule");
   const btnGasha = $("#btn-gasha");
+  let leverRotation = 0;
 
   async function runGasha() {
     if (state.isGashaRunning) return;
@@ -159,9 +160,11 @@
     state.isGashaRunning = true;
     btnGasha.disabled = true;
 
-    lever.classList.add("pulled");
-    await wait(250);
-    lever.classList.remove("pulled");
+    // Spin only the dial (720deg), forward each time rather than snapping
+    // back, then let the capsule drop once it's done turning.
+    leverRotation += 720;
+    lever.style.transform = `rotate(${leverRotation}deg)`;
+    await wait(600);
 
     let capsule;
     try {
