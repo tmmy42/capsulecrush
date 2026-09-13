@@ -40,7 +40,7 @@
     <div class="auth-deco deco-dot dot-a" aria-hidden="true"></div>
     <svg class="auth-deco deco-wave wave-a" aria-hidden="true"><use href="#deco-wave"/></svg>
     <div class="auth-card">
-      <h1 class="logo">CapsuleCrush</h1>
+      <img src="logo.png" alt="CapsuleCrush" class="logo-image logo-image-auth" />
       <p class="tagline">Capsule the things you love</p>
 
       <div class="auth-tabs" role="tablist">
@@ -80,9 +80,9 @@
 
   <!-- ===== HOME (GASHAPON) SCREEN ===== -->
   <section id="screen-home" class="screen screen-home hidden">
-    <header class="topbar">
-      <h1 class="logo logo-sm">CapsuleCrush</h1>
-      <button id="btn-logout" class="icon-btn" title="Log out" aria-label="Log out">
+    <header class="home-header">
+      <img src="logo.png" alt="CapsuleCrush" class="logo-image logo-image-home" />
+      <button id="btn-logout" class="icon-btn logout-floating" title="Log out" aria-label="Log out">
         <svg class="icon" aria-hidden="true"><use href="#icon-logout"/></svg>
       </button>
     </header>
@@ -160,7 +160,7 @@
   <!-- ===== POST SCREEN ===== -->
   <section id="screen-post" class="screen screen-post hidden">
     <header class="topbar">
-      <h1 class="logo logo-sm" id="post-title">New Capsule</h1>
+      <h1 class="screen-title" id="post-title">New Capsule</h1>
     </header>
 
     <form id="form-post" class="post-form">
@@ -197,7 +197,7 @@
   <!-- ===== LIST SCREEN ===== -->
   <section id="screen-list" class="screen screen-list hidden">
     <header class="topbar">
-      <h1 class="logo logo-sm">Your Capsules</h1>
+      <h1 class="screen-title">Your Capsules</h1>
     </header>
     <div id="list-empty" class="empty-state hidden">
       <p>No capsules yet — start your collection.</p>
