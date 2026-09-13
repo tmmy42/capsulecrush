@@ -76,7 +76,7 @@
     $("#list-title").innerHTML = `${n}'s Capsules`;
     const heart = `<svg class="icon icon-inline icon-heart" aria-hidden="true"><use href="#icon-heart"/></svg>`;
     $("#empty-state-text").innerHTML = `What do you love about ${n}? — Start the collection ${heart}`;
-    $("#list-empty-text").innerHTML = `What do you love about ${n}? — Start the collection`;
+    $("#list-empty-text").innerHTML = `What do you love about ${n}? — Start the collection ${heart}`;
   }
 
   $("#form-login").addEventListener("submit", async (e) => {
