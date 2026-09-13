@@ -103,20 +103,43 @@
       <svg class="deco deco-dot ms-4" aria-hidden="true"><use href="#deco-dot"/></svg>
       <svg class="deco deco-star ms-5" aria-hidden="true"><use href="#deco-star"/></svg>
 
-      <!-- Gashapon machine: traced from the reference illustration's silhouette
-           and proportions, but built as independent parts (dome, capsules,
-           trim, body, base, dial) each with their own outline and fill —
-           recolored in the app's own palette. Only the dial group (#lever)
-           is animated; every other part stays completely still. -->
-      <svg class="machine" viewBox="0 0 220 300" aria-hidden="true">
+      <!-- Gashapon machine: one continuous outer silhouette (cap, gummy-round
+           dome, neck, trapezoid body, trapezoid base all share a single
+           traced outline — no independent per-part outlines) recolored in
+           the app's own palette. Internal seam lines mark the color bands;
+           only the dial group (#lever) is animated. -->
+      <svg class="machine" viewBox="0 0 220 280" aria-hidden="true">
         <defs>
-          <clipPath id="dome-clip"><circle cx="110" cy="116" r="90"/></clipPath>
+          <path id="machine-outline" d="
+            M110,6
+            C132,6 148,10 153,34
+            C171.37,47.62 182,69.2 182,92
+            C182,111.58 174.14,130.40 160,144
+            L160,158
+            L176,230
+            L188,254
+            L32,254
+            L44,230
+            L60,158
+            L60,144
+            C45.86,130.40 38,111.58 38,92
+            C38,69.2 48.63,47.62 67,34
+            C72,10 88,6 110,6
+            Z"/>
+          <clipPath id="machine-silhouette"><use href="#machine-outline"/></clipPath>
+          <clipPath id="dome-clip"><circle cx="110" cy="92" r="68"/></clipPath>
+
+          <clipPath id="band-cap"><rect x="0" y="0" width="220" height="20"/></clipPath>
+          <clipPath id="band-dome"><rect x="0" y="20" width="220" height="124"/></clipPath>
+          <clipPath id="band-trim"><rect x="0" y="144" width="220" height="14"/></clipPath>
+          <clipPath id="band-body"><rect x="0" y="158" width="220" height="72"/></clipPath>
+          <clipPath id="band-base"><rect x="0" y="230" width="220" height="50"/></clipPath>
 
           <linearGradient id="grad-cap" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#FF9FCB"/>
             <stop offset="100%" stop-color="#FF5FA0"/>
           </linearGradient>
-          <radialGradient id="grad-dome-glass" cx="34%" cy="26%" r="82%">
+          <radialGradient id="grad-dome-glass" cx="34%" cy="20%" r="88%">
             <stop offset="0%" stop-color="#F5FFFA"/>
             <stop offset="55%" stop-color="#D2F3E4"/>
             <stop offset="100%" stop-color="#DAD0F7"/>
@@ -140,59 +163,55 @@
           </radialGradient>
         </defs>
 
-        <ellipse class="machine-shadow" cx="110" cy="292" rx="88" ry="8"/>
+        <ellipse class="machine-shadow" cx="110" cy="272" rx="86" ry="7"/>
 
-        <!-- part: dome (static) -->
-        <g class="machine-part machine-part-dome">
-          <circle cx="110" cy="116" r="90" fill="url(#grad-dome-glass)" stroke="#1A1A1A" stroke-width="2.6"/>
-          <ellipse cx="76" cy="62" rx="18" ry="34" fill="#fff" opacity=".5" transform="rotate(-16 76 62)"/>
-          <path d="M84,24 C84,10 96,4 110,4 C124,4 136,10 136,24 Z" fill="url(#grad-cap)" stroke="#1A1A1A" stroke-width="2.6"/>
+        <g clip-path="url(#machine-silhouette)">
+          <g clip-path="url(#band-base)"><rect width="220" height="280" fill="url(#grad-machine-base)"/></g>
+          <g clip-path="url(#band-body)"><rect width="220" height="280" fill="url(#grad-machine-body)"/></g>
+          <g clip-path="url(#band-trim)"><rect width="220" height="280" fill="url(#grad-machine-trim)"/></g>
+          <g clip-path="url(#band-dome)"><rect width="220" height="280" fill="url(#grad-dome-glass)"/></g>
+          <g clip-path="url(#band-cap)"><rect width="220" height="280" fill="url(#grad-cap)"/></g>
+
+          <g clip-path="url(#dome-clip)">
+            <ellipse cx="82" cy="58" rx="17" ry="30" fill="#fff" opacity=".5" transform="rotate(-16 82 58)"/>
+          </g>
+
+          <rect x="100" y="147" width="20" height="7" rx="3" fill="#1A1A1A" opacity=".7"/>
+          <rect x="80" y="240" width="60" height="12" rx="6" fill="#1A1A1A" opacity=".22"/>
+
+          <!-- candy pile: a loose cluster of six same-size balls, denser
+               toward the bottom of the dome; later balls overlap earlier
+               ones so the pile keeps a little front-to-back depth -->
+          <g clip-path="url(#dome-clip)">
+            <circle cx="86" cy="98" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="130" cy="96" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="64" cy="126" r="15" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="108" cy="128" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="152" cy="124" r="15" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="108" cy="152" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
+            <ellipse cx="81" cy="94" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="125" cy="92" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="59" cy="122" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="103" cy="124" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="147" cy="120" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="103" cy="148" rx="4.2" ry="5.5" fill="#fff" opacity=".85"/>
+          </g>
         </g>
 
-        <!-- part: capsules piled inside the dome (static) — a small, loose
-             cluster of six same-size balls near the bottom of the dome, not
-             packed edge-to-edge; later balls overlap earlier ones so the
-             pile still reads with a little front-to-back depth -->
-        <g class="machine-part machine-part-capsules" clip-path="url(#dome-clip)">
-          <circle cx="88" cy="140" r="16" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
-          <circle cx="132" cy="138" r="16" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
-          <circle cx="66" cy="170" r="16" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="2"/>
-          <circle cx="110" cy="172" r="16" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="2"/>
-          <circle cx="154" cy="168" r="16" fill="#FFD23F" stroke="#1A1A1A" stroke-width="2"/>
-          <circle cx="110" cy="200" r="16" fill="#43C6F0" stroke="#1A1A1A" stroke-width="2"/>
+        <!-- internal seam lines: trim/body and body/base, following the
+             silhouette's own local width so they read as part of one form -->
+        <path d="M60,158 L160,158" fill="none" stroke="#1A1A1A" stroke-width="1.6" clip-path="url(#machine-silhouette)"/>
+        <path d="M44,230 L176,230" fill="none" stroke="#1A1A1A" stroke-width="1.6" clip-path="url(#machine-silhouette)"/>
 
-          <ellipse cx="83" cy="136" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-          <ellipse cx="127" cy="134" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-          <ellipse cx="61" cy="166" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-          <ellipse cx="105" cy="168" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-          <ellipse cx="149" cy="164" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-          <ellipse cx="105" cy="196" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-        </g>
+        <!-- the ONE continuous outer stroke -->
+        <use href="#machine-outline" class="machine-outline-stroke"/>
 
-        <!-- part: trim / coin plate (static) -->
-        <g class="machine-part machine-part-trim">
-          <rect x="24" y="200" width="172" height="20" rx="10" fill="url(#grad-machine-trim)" stroke="#1A1A1A" stroke-width="2.6"/>
-          <rect x="100" y="206" width="20" height="7" rx="3" fill="#1A1A1A" opacity=".7"/>
-        </g>
-
-        <!-- part: body (static) -->
-        <g class="machine-part machine-part-body">
-          <rect x="28" y="214" width="164" height="66" rx="16" fill="url(#grad-machine-body)" stroke="#1A1A1A" stroke-width="2.6"/>
-        </g>
-
-        <!-- part: base (static) — a trapezoid that flares outward toward
-             the bottom, per the reference illustration, rather than a
-             rounded bar -->
-        <g class="machine-part machine-part-base">
-          <polygon points="40,274 180,274 206,294 14,294" fill="url(#grad-machine-base)" stroke="#1A1A1A" stroke-width="2.6" stroke-linejoin="round"/>
-        </g>
-
-        <!-- part: dial / knob — the ONLY part that moves. transform-origin
-             is the dial's own center, so pulling the gasha spins just this
-             group while the dome/body/base stay put. -->
-        <g id="lever" class="machine-part machine-part-dial">
-          <circle cx="110" cy="246" r="22" fill="url(#grad-dial)" stroke="#1A1A1A" stroke-width="2.4"/>
-          <rect x="98" y="243.5" width="24" height="5" rx="2.5" fill="#1A1A1A" opacity=".8"/>
+        <!-- dial / knob — the ONLY part that moves. transform-origin is the
+             dial's own center, so pulling the gasha spins just this group
+             while the rest of the silhouette stays put. -->
+        <g id="lever">
+          <circle cx="110" cy="194" r="22" fill="url(#grad-dial)" stroke="#1A1A1A" stroke-width="2.4"/>
+          <rect x="98" y="191.5" width="24" height="5" rx="2.5" fill="#1A1A1A" opacity=".8"/>
         </g>
       </svg>
 
