@@ -77,12 +77,14 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Warped checkerboard ground: a sine-perturbed grid in two brand colors,
+   generated once as a static asset (see public/bg-checker.svg) rather than
+   scattered radial-gradient "glow" blobs. */
 body {
-  background-image:
-    radial-gradient(circle at 12% 18%, rgba(255,255,255,.5) 0 2%, transparent 3%),
-    radial-gradient(circle at 88% 12%, rgba(255,255,255,.45) 0 2%, transparent 3%),
-    radial-gradient(circle at 20% 85%, rgba(255,255,255,.45) 0 2%, transparent 3%),
-    radial-gradient(circle at 78% 92%, rgba(255,255,255,.45) 0 2%, transparent 3%);
+  background-image: url('bg-checker.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center top;
   background-attachment: fixed;
 }
 
@@ -113,33 +115,30 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 }
 .icon-inline { width: 16px; height: 16px; vertical-align: -3px; margin-right: 2px; }
 
-/* decorative shapes (star / dot / wave) — SVG, thin hairline strokes */
-.deco, .auth-deco { position: absolute; opacity: .85; pointer-events: none; }
+/* Decorative motifs — exactly two shapes (sparkle + dot), styled with the
+   same hairline stroke weight and soft shadow as the machine illustration
+   so they read as part of one scene rather than scattered clip-art. */
+.deco, .auth-deco {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(26,26,26,.16));
+}
 .deco-star {
-  width: 24px;
-  height: 24px;
   fill: var(--color-support);
   stroke: var(--color-ink);
-  stroke-width: 1.25;
-}
-.deco-wave {
-  width: 52px;
-  height: 14px;
-  stroke: var(--color-tertiary);
-  stroke-width: 2.5;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
 }
 .deco-dot {
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  border: var(--line-thin) solid var(--color-ink);
-  background: var(--color-secondary);
+  fill: var(--color-secondary);
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
 }
 
 /* ===== Wordmark: supplied image asset only — never recreated in type --- */
 .logo-image { display: block; height: auto; }
-.logo-image-auth { width: 220px; margin: 0 auto var(--space-2); }
-.logo-image-home { width: 260px; margin: 0 auto; }
+.logo-image-auth { width: 200px; margin: 0 auto var(--space-2); }
+.logo-image-home { width: 168px; margin: 0 auto; }
 
 .tagline {
   text-align: center;
@@ -233,9 +232,12 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 
 /* ===== Auth ===== */
 .screen-auth { justify-content: center; align-items: center; padding: var(--space-6); position: relative; }
-.star-a { top: 8%; left: 10%; }
-.dot-a { top: 14%; right: 12%; background: var(--color-primary); }
-.wave-a { bottom: 10%; left: 8%; }
+/* Auth decorations cluster at two opposite corners, partly tucked behind
+   the card's rounded edge, rather than floating free in open space */
+.star-a1 { width: 26px; height: 26px; top: 12px; left: 12px; transform: rotate(-14deg); }
+.dot-a1 { width: 12px; height: 12px; top: 46px; left: 6px; }
+.star-a2 { width: 18px; height: 18px; bottom: 12px; right: 12px; transform: rotate(16deg); }
+.dot-a2 { width: 14px; height: 14px; bottom: 44px; right: 6px; fill: var(--color-primary); }
 
 .auth-card {
   background: var(--color-surface);
@@ -313,173 +315,80 @@ input[type="file"] { border-style: dashed; cursor: pointer; font-style: normal; 
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 460px;
 }
-.dot-1 { top: 10%; right: 9%; background: var(--color-secondary); }
-.dot-2 { bottom: 22%; left: 7%; background: var(--color-primary); }
-.wave-1 { top: 40%; left: 3%; }
 
-.ms-1 { width: 30px; height: 30px; top: -14px; left: -30px; transform: rotate(-12deg); }
-.ms-2 { width: 18px; height: 18px; top: 40px; right: -26px; transform: rotate(10deg); }
-.ms-3 { width: 26px; height: 26px; bottom: 6px; right: -18px; transform: rotate(20deg); }
+/* Positioning frame for the machine + its decorations: everything below
+   is placed relative to this one box so the scene stays a single
+   composition instead of independently-scattered pieces. */
+.machine-scene {
+  position: relative;
+  width: 168px;
+  height: 259px;
+}
+
+/* Motifs placed on a loose arc around the dome, uneven size/rotation,
+   two tucked BEHIND the machine (lower stacking order) for depth */
+.ms-1 { width: 24px; height: 24px; top: -13px; left: -18px; transform: rotate(-14deg); z-index: 0; }
+.ms-2 { width: 11px; height: 11px; top: 5px; right: -14px; z-index: 2; }
+.ms-3 { width: 16px; height: 16px; top: 77px; right: -22px; transform: rotate(18deg); z-index: 0; }
+.ms-4 { width: 10px; height: 10px; bottom: 43px; left: -16px; z-index: 2; }
+.ms-5 { width: 19px; height: 19px; bottom: -8px; right: 5px; transform: rotate(-8deg); z-index: 0; }
 
 .machine {
-  position: relative;
-  width: 210px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 1;
-  filter: drop-shadow(0 14px 18px rgba(26,26,26,.20));
+  overflow: visible;
 }
+.machine-shadow { fill: #1A1A1A; opacity: .16; }
+.machine-outline-stroke { fill: none; stroke: var(--color-ink); stroke-width: 1.6; }
 
-/* --- Glass dome: a true circle, glass gradient + gloss highlight --- */
-.machine-dome {
-  width: 168px;
-  height: 168px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 28%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.15) 26%, transparent 40%),
-    linear-gradient(155deg, #F3FBFF 0%, #DCF2FF 45%, #BFE8FF 100%);
-  border: var(--line-thin) solid var(--color-ink);
-  position: relative;
-  overflow: hidden;
-}
-.dome-shine {
-  position: absolute;
-  top: 16px; left: 30px;
-  width: 30px; height: 54px;
-  background: rgba(255,255,255,.8);
-  border-radius: 50%;
-  transform: rotate(-16deg);
-  filter: blur(2px);
-}
-.machine-capsules { position: relative; width: 100%; height: 100%; }
-.mini-capsule {
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: var(--line-thin) solid var(--color-ink);
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 35%),
-    radial-gradient(circle at 65% 75%, var(--color-primary-deep) 0%, var(--color-primary) 65%);
-}
-.mc-1 { top: 82px; left: 20px; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 35%), radial-gradient(circle at 65% 75%, #2AA9D6 0%, var(--color-secondary) 65%); }
-.mc-2 { top: 66px; left: 58px; width: 24px; height: 24px; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 35%), radial-gradient(circle at 65% 75%, #E0AC00 0%, var(--color-support) 65%); }
-.mc-3 { top: 84px; left: 96px; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 35%), radial-gradient(circle at 65% 75%, var(--color-tertiary-deep) 0%, var(--color-tertiary) 65%); }
-.mc-4 { top: 102px; left: 40px; width: 24px; height: 24px; }
-.mc-5 { top: 106px; left: 80px; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 35%), radial-gradient(circle at 65% 75%, #2AA9D6 0%, var(--color-secondary) 65%); }
-.mc-6 { top: 108px; left: 116px; width: 22px; height: 22px; }
-.mc-7 { top: 40px; left: 80px; width: 20px; height: 20px; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 35%), radial-gradient(circle at 65% 75%, #E0AC00 0%, var(--color-support) 65%); }
-.mc-8 { top: 126px; left: 62px; width: 22px; height: 22px; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 35%), radial-gradient(circle at 65% 75%, var(--color-tertiary-deep) 0%, var(--color-tertiary) 65%); }
-
-/* --- Body: tapers toward the dome like a real cast gumball-machine
-   housing, instead of a flat-sided box --- */
-.machine-body {
-  width: 176px;
-  height: 100px;
-  background: linear-gradient(100deg, var(--color-primary-deep) 0%, var(--color-primary) 35%, var(--color-primary) 70%, var(--color-primary-deep) 100%);
-  border: var(--line-thin) solid var(--color-ink);
-  border-top: none;
-  position: relative;
-  margin-top: -2px;
-  clip-path: polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%);
-}
-.coin-slot {
-  position: absolute;
-  top: 14px;
-  right: 30px;
-  width: 8px;
-  height: 22px;
-  background: var(--color-ink);
-  border-radius: var(--shape-xs);
-  opacity: .85;
-}
-.lever-wrap {
-  position: absolute;
-  bottom: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.dial {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #E7E7E2 30%, #B9B9B2 100%);
-  border: var(--line-reg) solid var(--color-ink);
+#lever {
   cursor: pointer;
-  position: relative;
+  transform-box: fill-box;
+  transform-origin: center;
   transition: transform .3s cubic-bezier(.36,.07,.19,.97);
-  box-shadow: var(--elev-1);
 }
-.dial-grip {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 26px; height: 5px;
-  background: var(--color-ink);
-  border-radius: var(--shape-xs);
-  transform: translate(-50%, -50%);
-  opacity: .8;
-}
-.dial.pulled { transform: rotate(160deg); }
-
-/* --- Base: sized proportionally to the body, soft dispensing recess --- */
-.machine-chute {
-  width: 150px;
-  height: 40px;
-  background: linear-gradient(100deg, var(--color-tertiary-deep) 0%, var(--color-tertiary) 40%, var(--color-tertiary) 65%, var(--color-tertiary-deep) 100%);
-  border: var(--line-thin) solid var(--color-ink);
-  border-top: none;
-  border-radius: 0 0 var(--shape-md) var(--shape-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.chute-opening {
-  width: 56px;
-  height: 14px;
-  background: rgba(26,26,26,.55);
-  border-radius: var(--shape-xs);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,.35);
-}
+#lever.pulled { transform: rotate(160deg); }
 
 .falling-capsule {
   position: absolute;
-  top: 222px;
+  top: 189px;
   left: 50%;
   transform: translateX(-50%);
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   z-index: 3;
 }
 .falling-capsule .capsule-top, .falling-capsule .capsule-bottom {
   position: absolute;
   left: 0;
-  width: 44px;
-  height: 22px;
+  width: 32px;
+  height: 16px;
   border: var(--line-thin) solid var(--color-ink);
 }
 .falling-capsule .capsule-top {
   top: 0;
   background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 40%), var(--color-secondary);
-  border-radius: 22px 22px 0 0;
+  border-radius: 16px 16px 0 0;
   border-bottom: none;
 }
 .falling-capsule .capsule-bottom {
   bottom: 0;
   background: var(--color-surface);
-  border-radius: 0 0 22px 22px;
+  border-radius: 0 0 16px 16px;
   border-top: none;
 }
 
 /* The ONE deliberate animated sequence in the app: dial turn -> drop -> pop */
 .falling-capsule.dropping { animation: dropAndRoll 1.1s ease-in forwards; }
 @keyframes dropAndRoll {
-  0% { top: 222px; opacity: 1; transform: translateX(-50%) rotate(0deg); }
-  60% { top: 355px; transform: translateX(-50%) rotate(200deg); }
-  80% { top: 368px; transform: translateX(-70%) rotate(340deg); }
-  100% { top: 368px; transform: translateX(-30%) rotate(420deg); opacity: 1; }
+  0% { top: 189px; opacity: 1; transform: translateX(-50%) rotate(0deg); }
+  60% { top: 280px; transform: translateX(-50%) rotate(200deg); }
+  80% { top: 290px; transform: translateX(-70%) rotate(340deg); }
+  100% { top: 290px; transform: translateX(-30%) rotate(420deg); opacity: 1; }
 }
 .falling-capsule.popping .capsule-top { animation: popTop .4s ease forwards; }
 .falling-capsule.popping .capsule-bottom { animation: popBottom .4s ease forwards; }

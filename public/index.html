@@ -24,10 +24,10 @@
     <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
     <symbol id="icon-package-open" viewBox="0 0 24 24"><path d="M12 22v-9"/><path d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z"/><path d="M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13"/><path d="M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z"/></symbol>
     <symbol id="deco-star" viewBox="0 0 40 40">
-      <path d="M20 2 L24.5 15.5 L38 20 L24.5 24.5 L20 38 L15.5 24.5 L2 20 L15.5 15.5 Z" stroke-linejoin="round"/>
+      <path d="M20 3 C21 12 22 18 30 20 C22 22 21 28 20 37 C19 28 18 22 10 20 C18 18 19 12 20 3 Z" stroke-linejoin="round"/>
     </symbol>
-    <symbol id="deco-wave" viewBox="0 0 60 16">
-      <path d="M2 8c4-7 10-7 14 0s10 7 14 0 10-7 14 0 10 7 14 0" fill="none" stroke-linecap="round"/>
+    <symbol id="deco-dot" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="8"/>
     </symbol>
   </defs>
 </svg>
@@ -36,9 +36,10 @@
 
   <!-- ===== AUTH SCREEN ===== -->
   <section id="screen-auth" class="screen screen-auth">
-    <svg class="auth-deco deco-star star-a" aria-hidden="true"><use href="#deco-star"/></svg>
-    <div class="auth-deco deco-dot dot-a" aria-hidden="true"></div>
-    <svg class="auth-deco deco-wave wave-a" aria-hidden="true"><use href="#deco-wave"/></svg>
+    <svg class="auth-deco deco-star star-a1" aria-hidden="true"><use href="#deco-star"/></svg>
+    <svg class="auth-deco deco-dot dot-a1" aria-hidden="true"><use href="#deco-dot"/></svg>
+    <svg class="auth-deco deco-star star-a2" aria-hidden="true"><use href="#deco-star"/></svg>
+    <svg class="auth-deco deco-dot dot-a2" aria-hidden="true"><use href="#deco-dot"/></svg>
     <div class="auth-card">
       <img src="logo.png" alt="CapsuleCrush" class="logo-image logo-image-auth" />
       <p class="tagline">Capsule the things you love</p>
@@ -88,45 +89,104 @@
     </header>
 
     <div class="gasha-stage">
-      <div class="deco deco-dot dot-1" aria-hidden="true"></div>
-      <div class="deco deco-dot dot-2" aria-hidden="true"></div>
-      <svg class="deco deco-wave wave-1" aria-hidden="true"><use href="#deco-wave"/></svg>
+    <div class="machine-scene">
+      <!-- Decorative motifs: two shapes only (sparkle + dot), placed along a
+           loose arc around the machine with deliberately uneven size/angle,
+           some tucked behind the machine so the scene reads as one composition -->
+      <svg class="deco deco-star ms-1" aria-hidden="true"><use href="#deco-star"/></svg>
+      <svg class="deco deco-dot ms-2" aria-hidden="true"><use href="#deco-dot"/></svg>
+      <svg class="deco deco-star ms-3" aria-hidden="true"><use href="#deco-star"/></svg>
+      <svg class="deco deco-dot ms-4" aria-hidden="true"><use href="#deco-dot"/></svg>
+      <svg class="deco deco-star ms-5" aria-hidden="true"><use href="#deco-star"/></svg>
 
-      <div class="machine">
-        <svg class="deco deco-star ms-1" aria-hidden="true"><use href="#deco-star"/></svg>
-        <svg class="deco deco-star ms-2" aria-hidden="true"><use href="#deco-star"/></svg>
-        <svg class="deco deco-star ms-3" aria-hidden="true"><use href="#deco-star"/></svg>
+      <!-- Gashapon machine: one continuous outlined silhouette (dome, body and
+           base share a single stroked path) filled with gradients so the
+           whole thing reads as one illustration rather than stacked parts -->
+      <svg class="machine" viewBox="0 0 220 340" aria-hidden="true">
+        <defs>
+          <path id="machine-outline" d="M110,10
+            C158,10 190,42 198,86
+            C202,108 198,126 182,142
+            C196,158 202,182 202,208
+            C202,226 198,240 188,250
+            C198,262 202,278 202,296
+            C202,316 186,332 110,332
+            C34,332 18,316 18,296
+            C18,278 22,262 32,250
+            C22,240 18,226 18,208
+            C18,182 24,158 38,142
+            C22,126 18,108 22,86
+            C30,42 62,10 110,10 Z"/>
+          <clipPath id="machine-silhouette"><use href="#machine-outline"/></clipPath>
+          <clipPath id="machine-dome-band">
+            <path d="M0,0 L220,0 L220,150 C170,132 150,150 110,150 C70,150 50,132 0,150 Z"/>
+          </clipPath>
+          <clipPath id="machine-body-band">
+            <path d="M0,150 C50,132 70,150 110,150 C150,150 170,132 220,150 L220,258 C170,240 150,258 110,258 C70,258 50,240 0,258 Z"/>
+          </clipPath>
+          <clipPath id="machine-base-band">
+            <path d="M0,258 C50,240 70,258 110,258 C150,258 170,240 220,258 L220,340 L0,340 Z"/>
+          </clipPath>
+          <radialGradient id="grad-dome-glass" cx="35%" cy="28%" r="80%">
+            <stop offset="0%" stop-color="#F6FCFF"/>
+            <stop offset="55%" stop-color="#DDF2FF"/>
+            <stop offset="100%" stop-color="#B9E4FF"/>
+          </radialGradient>
+          <linearGradient id="grad-machine-body" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FF8FC3"/>
+            <stop offset="45%" stop-color="#FF5FA0"/>
+            <stop offset="100%" stop-color="#DE3B80"/>
+          </linearGradient>
+          <linearGradient id="grad-machine-base" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#AB8FF7"/>
+            <stop offset="55%" stop-color="#8F6FEF"/>
+            <stop offset="100%" stop-color="#6B49CE"/>
+          </linearGradient>
+        </defs>
 
-        <div class="machine-dome">
-          <div class="dome-shine" aria-hidden="true"></div>
-          <div class="machine-capsules">
-            <span class="mini-capsule mc-1"></span>
-            <span class="mini-capsule mc-2"></span>
-            <span class="mini-capsule mc-3"></span>
-            <span class="mini-capsule mc-4"></span>
-            <span class="mini-capsule mc-5"></span>
-            <span class="mini-capsule mc-6"></span>
-            <span class="mini-capsule mc-7"></span>
-            <span class="mini-capsule mc-8"></span>
-          </div>
-        </div>
-        <div class="machine-body">
-          <div class="coin-slot"></div>
-          <div class="lever-wrap">
-            <div id="lever" class="dial">
-              <div class="dial-grip"></div>
-            </div>
-          </div>
-        </div>
-        <div class="machine-chute">
-          <div class="chute-opening"></div>
-        </div>
-      </div>
+        <ellipse class="machine-shadow" cx="110" cy="326" rx="82" ry="9"/>
+
+        <g clip-path="url(#machine-silhouette)">
+          <g clip-path="url(#machine-base-band)"><rect x="0" y="0" width="220" height="340" fill="url(#grad-machine-base)"/></g>
+          <g clip-path="url(#machine-body-band)"><rect x="0" y="0" width="220" height="340" fill="url(#grad-machine-body)"/></g>
+          <g clip-path="url(#machine-dome-band)"><rect x="0" y="0" width="220" height="340" fill="url(#grad-dome-glass)"/></g>
+          <g clip-path="url(#machine-dome-band)">
+            <ellipse cx="78" cy="64" rx="17" ry="32" fill="#fff" opacity=".5" transform="rotate(-16 78 64)"/>
+          </g>
+
+          <!-- candies, each with its own glossy highlight -->
+          <g>
+            <circle cx="72" cy="108" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.2"/>
+            <circle cx="108" cy="92" r="13" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.2"/>
+            <circle cx="142" cy="112" r="15" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.2"/>
+            <circle cx="90" cy="132" r="13" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.2"/>
+            <circle cx="128" cy="134" r="12" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.2"/>
+            <circle cx="108" cy="118" r="11" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.2"/>
+            <ellipse cx="67" cy="103" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+            <ellipse cx="103" cy="88" rx="4" ry="5" fill="#fff" opacity=".85"/>
+            <ellipse cx="137" cy="107" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+            <ellipse cx="85" cy="128" rx="4" ry="5" fill="#fff" opacity=".85"/>
+            <ellipse cx="123" cy="130" rx="3.5" ry="4.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="103" cy="114" rx="3.5" ry="4.5" fill="#fff" opacity=".85"/>
+          </g>
+
+          <rect x="152" y="168" width="8" height="22" rx="3" fill="#1A1A1A" opacity=".75"/>
+          <rect x="80" y="296" width="60" height="14" rx="7" fill="#1A1A1A" opacity=".28"/>
+        </g>
+
+        <use href="#machine-outline" class="machine-outline-stroke"/>
+
+        <g id="lever">
+          <circle cx="110" cy="222" r="26" fill="#EFEFEA" stroke="#1A1A1A" stroke-width="1.5"/>
+          <rect x="97" y="219" width="26" height="5" rx="2.5" fill="#1A1A1A" opacity=".8"/>
+        </g>
+      </svg>
 
       <div id="falling-capsule" class="falling-capsule hidden">
         <div class="capsule-top"></div>
         <div class="capsule-bottom"></div>
       </div>
+    </div>
 
       <button id="btn-gasha" class="btn btn-gasha">
         <svg class="icon" aria-hidden="true"><use href="#icon-rotate"/></svg>
