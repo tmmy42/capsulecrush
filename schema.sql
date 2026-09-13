@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
+  partner_name TEXT NOT NULL,
   passcode_hash TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

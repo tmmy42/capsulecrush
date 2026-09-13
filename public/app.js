@@ -2,6 +2,7 @@
   const state = {
     token: localStorage.getItem("cc_token") || null,
     username: localStorage.getItem("cc_username") || null,
+    partnerName: localStorage.getItem("cc_partner_name") || null,
     capsules: [],
     editingId: null,
     isGashaRunning: false,
@@ -46,12 +47,25 @@
 
   // ---------- auth ----------
 
-  function setLoggedIn(token, username) {
+  function setLoggedIn(token, username, partnerName) {
     state.token = token;
     state.username = username;
+    state.partnerName = partnerName;
     localStorage.setItem("cc_token", token);
     localStorage.setItem("cc_username", username);
+    localStorage.setItem("cc_partner_name", partnerName);
+    applyPersonalization();
     showScreen("home");
+  }
+
+  function applyPersonalization() {
+    const name = state.partnerName || "them";
+    $("#home-subtitle").textContent = `Favorite things about ${name}`;
+    $("#post-text-label").textContent = `What you love about ${name}`;
+    $("#list-title").textContent = `${name}'s Capsules`;
+    const emptyText = `No favorite things about ${name} yet — start the collection.`;
+    $("#empty-state-text").textContent = emptyText;
+    $("#list-empty-text").textContent = emptyText;
   }
 
   $("#form-login").addEventListener("submit", async (e) => {
@@ -60,12 +74,12 @@
     errorEl.textContent = "";
     try {
       const username = $("#login-username").value.trim();
-      const passcode = $("#login-passcode").value;
+      const partner_name = $("#login-passcode").value;
       const data = await api("/api/auth/login", {
         method: "POST",
-        body: JSON.stringify({ username, passcode }),
+        body: JSON.stringify({ username, partner_name }),
       });
-      setLoggedIn(data.token, data.username);
+      setLoggedIn(data.token, data.username, data.partner_name);
     } catch (err) {
       errorEl.textContent = err.message;
     }
@@ -77,12 +91,12 @@
     errorEl.textContent = "";
     try {
       const username = $("#signup-username").value.trim();
-      const passcode = $("#signup-passcode").value;
+      const partner_name = $("#signup-passcode").value;
       const data = await api("/api/auth/signup", {
         method: "POST",
-        body: JSON.stringify({ username, passcode }),
+        body: JSON.stringify({ username, partner_name }),
       });
-      setLoggedIn(data.token, data.username);
+      setLoggedIn(data.token, data.username, data.partner_name);
     } catch (err) {
       errorEl.textContent = err.message;
     }
@@ -102,8 +116,10 @@
     try { await api("/api/auth/logout", { method: "POST" }); } catch (_) { /* ignore */ }
     state.token = null;
     state.username = null;
+    state.partnerName = null;
     localStorage.removeItem("cc_token");
     localStorage.removeItem("cc_username");
+    localStorage.removeItem("cc_partner_name");
     showScreen("auth");
   });
 
@@ -213,7 +229,7 @@
   function resetPostForm() {
     state.editingId = null;
     pendingImageKey = null;
-    $("#post-title").textContent = "New Capsule";
+    $("#post-title").textContent = `New Capsule for ${state.partnerName || "them"}`;
     $("#post-text").value = "";
     $("#post-date").value = "";
     $("#post-image").value = "";
@@ -329,7 +345,7 @@
   function startEdit(capsule) {
     state.editingId = capsule.id;
     pendingImageKey = capsule.image_key || null;
-    $("#post-title").textContent = "Edit Capsule";
+    $("#post-title").textContent = `Edit Capsule for ${state.partnerName || "them"}`;
     $("#post-text").value = capsule.text;
     $("#post-date").value = capsule.memo_date || "";
     $("#post-image").value = "";
@@ -357,9 +373,29 @@
 
   // ---------- init ----------
 
-  if (state.token) {
+  async function init() {
+    if (!state.token) {
+      showScreen("auth");
+      return;
+    }
+    if (!state.partnerName) {
+      try {
+        const me = await api("/api/auth/me");
+        state.partnerName = me.partner_name;
+        localStorage.setItem("cc_partner_name", me.partner_name);
+      } catch (_) {
+        // session invalid/expired — send back to auth
+        state.token = null;
+        localStorage.removeItem("cc_token");
+        localStorage.removeItem("cc_username");
+        localStorage.removeItem("cc_partner_name");
+        showScreen("auth");
+        return;
+      }
+    }
+    applyPersonalization();
     showScreen("home");
-  } else {
-    showScreen("auth");
   }
+
+  init();
 })();

@@ -88,6 +88,18 @@ body {
   background-attachment: fixed;
 }
 
+/* Vintage film-grain overlay: fixed above everything, ignores input */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background-image: url('grain.svg');
+  background-size: 160px 160px;
+  opacity: .05;
+  mix-blend-mode: multiply;
+}
+
 #app {
   max-width: 480px;
   margin: 0 auto;
@@ -138,7 +150,15 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 /* ===== Wordmark: supplied image asset only — never recreated in type --- */
 .logo-image { display: block; height: auto; }
 .logo-image-auth { width: 200px; margin: 0 auto var(--space-2); }
-.logo-image-home { width: 168px; margin: 0 auto; }
+.logo-image-home { width: 260px; margin: 0 auto; }
+
+.home-subtitle {
+  text-align: center;
+  margin: var(--space-1) 0 0;
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
 
 .tagline {
   text-align: center;
@@ -225,8 +245,9 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 .home-header {
   position: relative;
   display: flex;
-  justify-content: center;
-  padding: var(--space-2) 0 var(--space-4);
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-1) 0 var(--space-3);
 }
 .logout-floating { position: absolute; top: 0; right: 0; }
 
@@ -323,16 +344,16 @@ input[type="file"] { border-style: dashed; cursor: pointer; font-style: normal; 
 .machine-scene {
   position: relative;
   width: 168px;
-  height: 259px;
+  height: 214px;
 }
 
 /* Motifs placed on a loose arc around the dome, uneven size/rotation,
    two tucked BEHIND the machine (lower stacking order) for depth */
-.ms-1 { width: 24px; height: 24px; top: -13px; left: -18px; transform: rotate(-14deg); z-index: 0; }
-.ms-2 { width: 11px; height: 11px; top: 5px; right: -14px; z-index: 2; }
-.ms-3 { width: 16px; height: 16px; top: 77px; right: -22px; transform: rotate(18deg); z-index: 0; }
-.ms-4 { width: 10px; height: 10px; bottom: 43px; left: -16px; z-index: 2; }
-.ms-5 { width: 19px; height: 19px; bottom: -8px; right: 5px; transform: rotate(-8deg); z-index: 0; }
+.ms-1 { width: 20px; height: 20px; top: -11px; left: -15px; transform: rotate(-14deg); z-index: 0; }
+.ms-2 { width: 9px; height: 9px; top: 4px; right: -12px; z-index: 2; }
+.ms-3 { width: 13px; height: 13px; top: 64px; right: -18px; transform: rotate(18deg); z-index: 0; }
+.ms-4 { width: 8px; height: 8px; bottom: 36px; left: -13px; z-index: 2; }
+.ms-5 { width: 16px; height: 16px; bottom: -7px; right: 4px; transform: rotate(-8deg); z-index: 0; }
 
 .machine {
   position: absolute;
@@ -355,7 +376,7 @@ input[type="file"] { border-style: dashed; cursor: pointer; font-style: normal; 
 
 .falling-capsule {
   position: absolute;
-  top: 189px;
+  top: 160px;
   left: 50%;
   transform: translateX(-50%);
   width: 32px;
@@ -385,10 +406,10 @@ input[type="file"] { border-style: dashed; cursor: pointer; font-style: normal; 
 /* The ONE deliberate animated sequence in the app: dial turn -> drop -> pop */
 .falling-capsule.dropping { animation: dropAndRoll 1.1s ease-in forwards; }
 @keyframes dropAndRoll {
-  0% { top: 189px; opacity: 1; transform: translateX(-50%) rotate(0deg); }
-  60% { top: 280px; transform: translateX(-50%) rotate(200deg); }
-  80% { top: 290px; transform: translateX(-70%) rotate(340deg); }
-  100% { top: 290px; transform: translateX(-30%) rotate(420deg); opacity: 1; }
+  0% { top: 160px; opacity: 1; transform: translateX(-50%) rotate(0deg); }
+  60% { top: 235px; transform: translateX(-50%) rotate(200deg); }
+  80% { top: 245px; transform: translateX(-70%) rotate(340deg); }
+  100% { top: 245px; transform: translateX(-30%) rotate(420deg); opacity: 1; }
 }
 .falling-capsule.popping .capsule-top { animation: popTop .4s ease forwards; }
 .falling-capsule.popping .capsule-bottom { animation: popBottom .4s ease forwards; }

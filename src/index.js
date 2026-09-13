@@ -17,8 +17,8 @@ function isValidUsername(username) {
   return typeof username === "string" && /^[a-zA-Z0-9_]{3,32}$/.test(username);
 }
 
-function isValidPasscode(passcode) {
-  return typeof passcode === "string" && passcode.length >= 4 && passcode.length <= 64;
+function isValidPartnerName(partnerName) {
+  return typeof partnerName === "string" && partnerName.trim().length >= 1 && partnerName.trim().length <= 64;
 }
 
 async function requireAuth(c, next) {
@@ -41,13 +41,13 @@ async function requireAuth(c, next) {
 
 app.post("/api/auth/signup", async (c) => {
   const body = await c.req.json().catch(() => ({}));
-  const { username, passcode } = body;
+  const { username, partner_name } = body;
 
   if (!isValidUsername(username)) {
-    return c.json({ error: "Username must be 3-32 characters (letters, numbers, underscore)" }, 400);
+    return c.json({ error: "Your name must be 3-32 characters (letters, numbers, underscore)" }, 400);
   }
-  if (!isValidPasscode(passcode)) {
-    return c.json({ error: "Passcode must be 4-64 characters" }, 400);
+  if (!isValidPartnerName(partner_name)) {
+    return c.json({ error: "Their name must be 1-64 characters" }, 400);
   }
 
   const existing = await c.env.DB.prepare(`SELECT id FROM users WHERE username = ?`)
@@ -58,11 +58,12 @@ app.post("/api/auth/signup", async (c) => {
   }
 
   const userId = uuid();
-  const passcodeHash = await sha256Hex(passcode);
+  const partnerName = partner_name.trim();
+  const passcodeHash = await sha256Hex(partnerName);
   await c.env.DB.prepare(
-    `INSERT INTO users (id, username, passcode_hash) VALUES (?, ?, ?)`
+    `INSERT INTO users (id, username, partner_name, passcode_hash) VALUES (?, ?, ?, ?)`
   )
-    .bind(userId, username, passcodeHash)
+    .bind(userId, username, partnerName, passcodeHash)
     .run();
 
   const token = uuid();
@@ -70,29 +71,29 @@ app.post("/api/auth/signup", async (c) => {
     .bind(token, userId)
     .run();
 
-  return c.json({ token, username });
+  return c.json({ token, username, partner_name: partnerName });
 });
 
 app.post("/api/auth/login", async (c) => {
   const body = await c.req.json().catch(() => ({}));
-  const { username, passcode } = body;
+  const { username, partner_name } = body;
 
-  if (!isValidUsername(username) || !isValidPasscode(passcode)) {
-    return c.json({ error: "Username or passcode is incorrect" }, 401);
+  if (!isValidUsername(username) || !isValidPartnerName(partner_name)) {
+    return c.json({ error: "Your name or their name is incorrect" }, 401);
   }
 
   const user = await c.env.DB.prepare(
-    `SELECT id, passcode_hash FROM users WHERE username = ?`
+    `SELECT id, partner_name, passcode_hash FROM users WHERE username = ?`
   )
     .bind(username)
     .first();
   if (!user) {
-    return c.json({ error: "Username or passcode is incorrect" }, 401);
+    return c.json({ error: "Your name or their name is incorrect" }, 401);
   }
 
-  const passcodeHash = await sha256Hex(passcode);
+  const passcodeHash = await sha256Hex(partner_name.trim());
   if (passcodeHash !== user.passcode_hash) {
-    return c.json({ error: "Username or passcode is incorrect" }, 401);
+    return c.json({ error: "Your name or their name is incorrect" }, 401);
   }
 
   const token = uuid();
@@ -100,7 +101,16 @@ app.post("/api/auth/login", async (c) => {
     .bind(token, user.id)
     .run();
 
-  return c.json({ token, username });
+  return c.json({ token, username, partner_name: user.partner_name });
+});
+
+app.get("/api/auth/me", requireAuth, async (c) => {
+  const userId = c.get("userId");
+  const user = await c.env.DB.prepare(`SELECT username, partner_name FROM users WHERE id = ?`)
+    .bind(userId)
+    .first();
+  if (!user) return c.json({ error: "User not found" }, 404);
+  return c.json({ username: user.username, partner_name: user.partner_name });
 });
 
 app.post("/api/auth/logout", requireAuth, async (c) => {

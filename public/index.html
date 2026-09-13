@@ -9,6 +9,9 @@
 </head>
 <body>
 
+<!-- Subtle film-grain overlay for a vintage, less-flat finish -->
+<div class="grain-overlay" aria-hidden="true"></div>
+
 <!-- Lucide icon sprite: symbols defined once, referenced via <use> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -51,11 +54,11 @@
 
       <form id="form-login" class="auth-form">
         <div class="field">
-          <label class="field-label" for="login-username">Username</label>
+          <label class="field-label" for="login-username">Your name</label>
           <input type="text" id="login-username" autocomplete="username" required maxlength="32" />
         </div>
         <div class="field">
-          <label class="field-label" for="login-passcode">Passcode</label>
+          <label class="field-label" for="login-passcode">Their name <span class="hint">also your passcode</span></label>
           <input type="password" id="login-passcode" autocomplete="current-password" required maxlength="64" />
         </div>
 
@@ -65,11 +68,11 @@
 
       <form id="form-signup" class="auth-form hidden">
         <div class="field">
-          <label class="field-label" for="signup-username">Username <span class="hint">letters, numbers, underscore · 3-32</span></label>
+          <label class="field-label" for="signup-username">Your name <span class="hint">letters, numbers, underscore · 3-32</span></label>
           <input type="text" id="signup-username" autocomplete="username" required maxlength="32" />
         </div>
         <div class="field">
-          <label class="field-label" for="signup-passcode">Passcode <span class="hint">4-64 characters</span></label>
+          <label class="field-label" for="signup-passcode">Their name <span class="hint">this doubles as your passcode</span></label>
           <input type="password" id="signup-passcode" autocomplete="new-password" required maxlength="64" />
         </div>
 
@@ -83,6 +86,7 @@
   <section id="screen-home" class="screen screen-home hidden">
     <header class="home-header">
       <img src="logo.png" alt="CapsuleCrush" class="logo-image logo-image-home" />
+      <p class="home-subtitle" id="home-subtitle"></p>
       <button id="btn-logout" class="icon-btn logout-floating" title="Log out" aria-label="Log out">
         <svg class="icon" aria-hidden="true"><use href="#icon-logout"/></svg>
       </button>
@@ -99,86 +103,104 @@
       <svg class="deco deco-dot ms-4" aria-hidden="true"><use href="#deco-dot"/></svg>
       <svg class="deco deco-star ms-5" aria-hidden="true"><use href="#deco-star"/></svg>
 
-      <!-- Gashapon machine: one continuous outlined silhouette (dome, body and
-           base share a single stroked path) filled with gradients so the
-           whole thing reads as one illustration rather than stacked parts -->
-      <svg class="machine" viewBox="0 0 220 340" aria-hidden="true">
+      <!-- Gashapon machine: one continuous outlined silhouette (round dome,
+           straight-sided body, slim base — proportions from the reference
+           illustration) filled with gradients from the app's own palette -->
+      <svg class="machine" viewBox="0 0 220 280" aria-hidden="true">
         <defs>
-          <path id="machine-outline" d="M110,10
-            C158,10 190,42 198,86
-            C202,108 198,126 182,142
-            C196,158 202,182 202,208
-            C202,226 198,240 188,250
-            C198,262 202,278 202,296
-            C202,316 186,332 110,332
-            C34,332 18,316 18,296
-            C18,278 22,262 32,250
-            C22,240 18,226 18,208
-            C18,182 24,158 38,142
-            C22,126 18,108 22,86
-            C30,42 62,10 110,10 Z"/>
+          <path id="machine-outline" d="M110,8
+            C166,8 202,46 202,100
+            C202,138 190,160 172,172
+            C182,176 188,184 188,196
+            C188,214 188,228 184,238
+            C202,240 210,248 210,258
+            C210,270 178,276 110,276
+            C42,276 10,270 10,258
+            C10,248 18,240 36,238
+            C32,228 32,214 32,196
+            C32,184 38,176 48,172
+            C30,160 18,138 18,100
+            C18,46 54,8 110,8 Z"/>
           <clipPath id="machine-silhouette"><use href="#machine-outline"/></clipPath>
-          <clipPath id="machine-dome-band">
-            <path d="M0,0 L220,0 L220,150 C170,132 150,150 110,150 C70,150 50,132 0,150 Z"/>
-          </clipPath>
-          <clipPath id="machine-body-band">
-            <path d="M0,150 C50,132 70,150 110,150 C150,150 170,132 220,150 L220,258 C170,240 150,258 110,258 C70,258 50,240 0,258 Z"/>
-          </clipPath>
-          <clipPath id="machine-base-band">
-            <path d="M0,258 C50,240 70,258 110,258 C150,258 170,240 220,258 L220,340 L0,340 Z"/>
-          </clipPath>
-          <radialGradient id="grad-dome-glass" cx="35%" cy="28%" r="80%">
+          <clipPath id="machine-dome-band"><path d="M0,0 L220,0 L220,178 L0,178 Z"/></clipPath>
+          <clipPath id="machine-trim-band"><path d="M0,178 L220,178 L220,194 L0,194 Z"/></clipPath>
+          <clipPath id="machine-body-band"><path d="M0,194 L220,194 L220,240 L0,240 Z"/></clipPath>
+          <clipPath id="machine-base-band"><path d="M0,240 L220,240 L220,280 L0,280 Z"/></clipPath>
+
+          <radialGradient id="grad-dome-glass" cx="35%" cy="26%" r="80%">
             <stop offset="0%" stop-color="#F6FCFF"/>
             <stop offset="55%" stop-color="#DDF2FF"/>
             <stop offset="100%" stop-color="#B9E4FF"/>
           </radialGradient>
+          <linearGradient id="grad-machine-trim" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#A9E8CB"/>
+            <stop offset="100%" stop-color="#8AD9B4"/>
+          </linearGradient>
           <linearGradient id="grad-machine-body" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#FF8FC3"/>
-            <stop offset="45%" stop-color="#FF5FA0"/>
-            <stop offset="100%" stop-color="#DE3B80"/>
+            <stop offset="0%" stop-color="#FFE07A"/>
+            <stop offset="55%" stop-color="#FFD23F"/>
+            <stop offset="100%" stop-color="#F0B90E"/>
           </linearGradient>
           <linearGradient id="grad-machine-base" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#AB8FF7"/>
-            <stop offset="55%" stop-color="#8F6FEF"/>
-            <stop offset="100%" stop-color="#6B49CE"/>
+            <stop offset="0%" stop-color="#FF8FC3"/>
+            <stop offset="100%" stop-color="#FF5FA0"/>
           </linearGradient>
         </defs>
 
-        <ellipse class="machine-shadow" cx="110" cy="326" rx="82" ry="9"/>
+        <ellipse class="machine-shadow" cx="110" cy="270" rx="88" ry="8"/>
 
         <g clip-path="url(#machine-silhouette)">
-          <g clip-path="url(#machine-base-band)"><rect x="0" y="0" width="220" height="340" fill="url(#grad-machine-base)"/></g>
-          <g clip-path="url(#machine-body-band)"><rect x="0" y="0" width="220" height="340" fill="url(#grad-machine-body)"/></g>
-          <g clip-path="url(#machine-dome-band)"><rect x="0" y="0" width="220" height="340" fill="url(#grad-dome-glass)"/></g>
+          <g clip-path="url(#machine-base-band)"><rect width="220" height="280" fill="url(#grad-machine-base)"/></g>
+          <g clip-path="url(#machine-body-band)"><rect width="220" height="280" fill="url(#grad-machine-body)"/></g>
+          <g clip-path="url(#machine-trim-band)"><rect width="220" height="280" fill="url(#grad-machine-trim)"/></g>
+          <g clip-path="url(#machine-dome-band)"><rect width="220" height="280" fill="url(#grad-dome-glass)"/></g>
           <g clip-path="url(#machine-dome-band)">
-            <ellipse cx="78" cy="64" rx="17" ry="32" fill="#fff" opacity=".5" transform="rotate(-16 78 64)"/>
+            <ellipse cx="76" cy="62" rx="18" ry="34" fill="#fff" opacity=".5" transform="rotate(-16 76 62)"/>
           </g>
 
-          <!-- candies, each with its own glossy highlight -->
+          <rect x="100" y="181" width="20" height="7" rx="3" fill="#1A1A1A" opacity=".7"/>
+          <rect x="82" y="256" width="56" height="12" rx="6" fill="#1A1A1A" opacity=".22"/>
+
+          <!-- candy pile: piled up from the bottom of the dome, denser and
+               larger lower down, sparser and smaller near the top. Balls
+               drawn later overlap/occlude the ones drawn before them so the
+               pile reads with real front-to-back depth. -->
           <g>
-            <circle cx="72" cy="108" r="15" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.2"/>
-            <circle cx="108" cy="92" r="13" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.2"/>
-            <circle cx="142" cy="112" r="15" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.2"/>
-            <circle cx="90" cy="132" r="13" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.2"/>
-            <circle cx="128" cy="134" r="12" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.2"/>
-            <circle cx="108" cy="118" r="11" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.2"/>
-            <ellipse cx="67" cy="103" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-            <ellipse cx="103" cy="88" rx="4" ry="5" fill="#fff" opacity=".85"/>
-            <ellipse cx="137" cy="107" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
-            <ellipse cx="85" cy="128" rx="4" ry="5" fill="#fff" opacity=".85"/>
-            <ellipse cx="123" cy="130" rx="3.5" ry="4.5" fill="#fff" opacity=".85"/>
-            <ellipse cx="103" cy="114" rx="3.5" ry="4.5" fill="#fff" opacity=".85"/>
-          </g>
+            <circle cx="92" cy="95" r="12" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.1"/>
+            <circle cx="128" cy="92" r="11" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.1"/>
+            <circle cx="110" cy="108" r="10" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.1"/>
 
-          <rect x="152" y="168" width="8" height="22" rx="3" fill="#1A1A1A" opacity=".75"/>
-          <rect x="80" y="296" width="60" height="14" rx="7" fill="#1A1A1A" opacity=".28"/>
+            <circle cx="78" cy="122" r="15" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.2"/>
+            <circle cx="142" cy="120" r="14" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.2"/>
+            <circle cx="110" cy="132" r="13" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.2"/>
+
+            <circle cx="62" cy="148" r="17" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.3"/>
+            <circle cx="96" cy="152" r="17" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.3"/>
+            <circle cx="130" cy="150" r="16" fill="#FFD23F" stroke="#1A1A1A" stroke-width="1.3"/>
+            <circle cx="158" cy="146" r="14" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.3"/>
+
+            <circle cx="80" cy="170" r="17" fill="#43C6F0" stroke="#1A1A1A" stroke-width="1.3"/>
+            <circle cx="114" cy="172" r="18" fill="#8F6FEF" stroke="#1A1A1A" stroke-width="1.3"/>
+            <circle cx="146" cy="168" r="16" fill="#FF5FA0" stroke="#1A1A1A" stroke-width="1.3"/>
+
+            <ellipse cx="87" cy="91" rx="3.5" ry="4.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="123" cy="88" rx="3" ry="4" fill="#fff" opacity=".85"/>
+            <ellipse cx="72" cy="117" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+            <ellipse cx="136" cy="115" rx="4" ry="5.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="56" cy="142" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="90" cy="146" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="124" cy="144" rx="4.5" ry="6" fill="#fff" opacity=".85"/>
+            <ellipse cx="74" cy="164" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
+            <ellipse cx="107" cy="165" rx="5.5" ry="7" fill="#fff" opacity=".85"/>
+            <ellipse cx="140" cy="161" rx="5" ry="6.5" fill="#fff" opacity=".85"/>
+          </g>
         </g>
 
         <use href="#machine-outline" class="machine-outline-stroke"/>
 
         <g id="lever">
-          <circle cx="110" cy="222" r="26" fill="#EFEFEA" stroke="#1A1A1A" stroke-width="1.5"/>
-          <rect x="97" y="219" width="26" height="5" rx="2.5" fill="#1A1A1A" opacity=".8"/>
+          <circle cx="110" cy="216" r="20" fill="#EFEFEA" stroke="#1A1A1A" stroke-width="1.4"/>
+          <rect x="99" y="213.5" width="22" height="5" rx="2.5" fill="#1A1A1A" opacity=".8"/>
         </g>
       </svg>
 
@@ -195,7 +217,7 @@
     </div>
 
     <div id="empty-state" class="empty-state hidden">
-      <p>No capsules yet — start your collection.</p>
+      <p id="empty-state-text">No capsules yet — start your collection.</p>
       <button class="btn btn-secondary" data-nav="post">Add Your First Capsule</button>
     </div>
 
@@ -225,7 +247,7 @@
 
     <form id="form-post" class="post-form">
       <div class="field">
-        <label class="field-label" for="post-text">What you love <span class="req">Required</span></label>
+        <label class="field-label" for="post-text"><span id="post-text-label">What you love</span> <span class="req">Required</span></label>
         <textarea id="post-text" required maxlength="2000" rows="5" placeholder="e.g. how they always say good morning first" lang="ja"></textarea>
       </div>
 
@@ -257,10 +279,10 @@
   <!-- ===== LIST SCREEN ===== -->
   <section id="screen-list" class="screen screen-list hidden">
     <header class="topbar">
-      <h1 class="screen-title">Your Capsules</h1>
+      <h1 class="screen-title" id="list-title">Your Capsules</h1>
     </header>
     <div id="list-empty" class="empty-state hidden">
-      <p>No capsules yet — start your collection.</p>
+      <p id="list-empty-text">No capsules yet — start your collection.</p>
       <button class="btn btn-secondary" data-nav="post">Add Your First Capsule</button>
     </div>
     <div id="list-grid" class="list-grid"></div>
