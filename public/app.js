@@ -671,20 +671,26 @@
   let albumBlob = null;
   let albumSetupTheme = DEFAULT_THEME;
 
-  // Small Lucide "cloud" icon appended right after the tagline text — a
-  // thought-bubble silhouette (musing over what you love), not a speech
-  // bubble. Fixed black outline / white fill regardless of theme, per
-  // spec. Encoded as a base64 data-URI <img> rather than an inline <svg>
-  // — testing showed html2canvas silently drops raw inline SVG subtrees
-  // but handles actual <img> elements (data URIs included) reliably via
-  // plain drawImage.
+  // Custom thought-bubble icon appended right after the tagline text — a
+  // bumpy cloud silhouette with two small trailing circles beneath it,
+  // the classic "thinking" bubble shape. Not in Lucide's set, so hand-
+  // drawn here rather than adapted from an existing icon. Fixed black
+  // outline / white fill regardless of theme, per spec. Encoded as a
+  // base64 data-URI <img> rather than an inline <svg> — testing showed
+  // html2canvas silently drops raw inline SVG subtrees but handles
+  // actual <img> elements (data URIs included) reliably via plain
+  // drawImage.
   function buildTaglineIcon() {
     const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">` +
-      `<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" ` +
-      `fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+      `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="30" viewBox="0 0 26 30">` +
+      `<path d="M8,15 C4,15 3,11 6.2,9.6 C5.3,6.2 9,3.6 12,5.6 C13.2,2.6 19,2.1 21,5.1 ` +
+      `C24.2,4.2 26.2,7.2 24,10 C26.2,11.2 25,15.2 21,15.2 C21,16.8 18,17.8 15,16.8 ` +
+      `C12,18.4 8,17.8 8,15 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.6" stroke-linejoin="round"/>` +
+      `<circle cx="8.5" cy="21" r="2.6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.6"/>` +
+      `<circle cx="5" cy="26.5" r="1.5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.6"/>` +
+      `</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-tagline-icon" src="${dataUri}" width="24" height="24" alt="" />`;
+    return `<img class="album-tagline-icon" src="${dataUri}" width="26" height="30" alt="" />`;
   }
 
   // Faux text-stroke via eight stacked, unblurred text-shadows — far more

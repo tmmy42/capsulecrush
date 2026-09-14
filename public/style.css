@@ -746,7 +746,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .album-names-to {
   font-family: var(--font-heading);
   font-style: italic;
-  font-size: 1.9rem;
+  font-size: 2.3rem;
   font-weight: 700;
   margin: 0 16px;
 }
@@ -758,12 +758,14 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   color: var(--color-ink-soft);
   margin-top: 10px;
 }
-/* Small cloud icon right after the tagline text — theme-colored fill,
-   sized to sit comfortably inline with the tagline's own text height. */
+/* Thought-bubble icon right after the tagline text — fixed black
+   outline / white fill, sized to sit comfortably inline with the
+   tagline's own text height (a bit taller than wide, since it includes
+   the two trailing circles beneath the cloud). */
 .album-tagline-icon {
-  width: 26px;
+  width: 22px;
   height: 26px;
-  vertical-align: -6px;
+  vertical-align: -8px;
   margin-left: 2px;
 }
 .album-grid {
