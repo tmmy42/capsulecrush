@@ -429,6 +429,7 @@
     const empty = $("#list-empty");
     grid.innerHTML = "";
     empty.classList.toggle("hidden", state.capsules.length > 0);
+    $("#btn-create-album").classList.toggle("hidden", state.capsules.length === 0);
 
     state.capsules.forEach((capsule) => {
       const card = document.createElement("div");
@@ -487,6 +488,117 @@
       alert(err.message);
     }
   }
+
+  // ---------- album ----------
+
+  let albumBlob = null;
+
+  function buildAlbumMarkup(capsules, partnerName) {
+    const name = escapeHtml(partnerName || "them");
+    const bgClasses = ["", "album-card-b", "album-card-c"];
+    const cards = capsules
+      .map((c, i) => {
+        const dateStr = c.memo_date || c.created_at.slice(0, 10);
+        const rotate = i % 2 === 0 ? -2 : 1.6;
+        const bgClass = bgClasses[i % bgClasses.length];
+        const img = c.image_key
+          ? `<img src="/api/images/${c.image_key}" class="album-card-img" alt="" />`
+          : "";
+        return `
+          <div class="album-card ${bgClass}" style="transform: rotate(${rotate}deg)">
+            ${img}
+            <div class="album-card-date">${escapeHtml(formatDate(dateStr))}</div>
+            <div class="album-card-text">${escapeHtml(c.text)}</div>
+          </div>
+        `;
+      })
+      .join("");
+
+    return `
+      <div class="album-header">
+        <img src="logo.png" class="album-logo" alt="" />
+        <div class="album-title">Favorite things about ${name} &#9829;</div>
+      </div>
+      <div class="album-grid">${cards}</div>
+      <div class="album-footer">Made with CapsuleCrush &#9829;</div>
+    `;
+  }
+
+  async function generateAlbum() {
+    if (state.capsules.length === 0) return;
+    const btn = $("#btn-create-album");
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-rotate"/></svg> Generating...`;
+
+    const container = $("#album-render");
+    try {
+      container.innerHTML = buildAlbumMarkup(state.capsules, state.partnerName);
+
+      const imgs = Array.from(container.querySelectorAll("img"));
+      await Promise.all(
+        imgs.map((img) =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise((resolve) => {
+                img.onload = resolve;
+                img.onerror = resolve;
+              })
+        )
+      );
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+
+      const canvas = await html2canvas(container, {
+        backgroundColor: "#CBF3DC",
+        scale: 2,
+        useCORS: true,
+      });
+
+      albumBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      $("#album-preview-img").src = URL.createObjectURL(albumBlob);
+      $("#album-modal").classList.remove("hidden");
+    } catch (err) {
+      alert("Couldn't create the album: " + err.message);
+    } finally {
+      container.innerHTML = "";
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+  }
+
+  $("#btn-create-album").addEventListener("click", generateAlbum);
+  $("#album-close").addEventListener("click", () => $("#album-modal").classList.add("hidden"));
+
+  $("#album-download").addEventListener("click", () => {
+    if (!albumBlob) return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(albumBlob);
+    a.download = `capsulecrush-album-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+
+  $("#album-share").addEventListener("click", async () => {
+    if (!albumBlob) return;
+    const file = new File([albumBlob], "capsulecrush-album.png", { type: "image/png" });
+    const shareData = {
+      files: [file],
+      title: "CapsuleCrush Album",
+      text: `Favorite things about ${state.partnerName || "them"}`,
+    };
+    if (navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if (err.name !== "AbortError") alert(err.message);
+      }
+    } else {
+      $("#album-download").click();
+    }
+  });
 
   // ---------- init ----------
 

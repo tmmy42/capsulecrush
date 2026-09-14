@@ -74,18 +74,28 @@ html, body {
   font-family: var(--font-body);
   font-style: italic;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
 }
 
 /* Warped checkerboard ground: a sine-perturbed grid in two brand colors,
    generated once as a static asset (see public/bg-checker.svg) rather than
-   scattered radial-gradient "glow" blobs. */
-body {
+   scattered radial-gradient "glow" blobs.
+   Rendered as its own position:fixed; inset:0 layer (the same proven
+   pattern as .stars-overlay below) instead of a body background-image with
+   background-attachment:fixed — mobile Safari has a long-standing bug
+   where a fixed-attachment body background fails to repaint correctly as
+   the dynamic address-bar/safe-area resizes, leaving the very top (behind
+   the status bar/notch) unpainted. inset:0 on a fixed element always
+   tracks the true visual viewport, notch included, with no such gap. */
+.bg-checker-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
   background-image: url('bg-checker.svg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center top;
-  background-attachment: fixed;
 }
 
 /* Scattered pixel-art stars: sits above the plain checkerboard body
@@ -121,6 +131,7 @@ body {
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -220,6 +231,7 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 .btn-block { width: 100%; }
 .btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
 .btn-secondary { background: var(--color-secondary); color: var(--color-on-secondary); }
+.btn-tertiary { background: var(--color-tertiary); color: var(--color-on-tertiary); }
 .btn-ghost { background: var(--color-surface); }
 /* Gasha CTA and the home/list empty-state action stay a touch smaller
    than a full primary button (the gashapon illustration is the star of
@@ -347,12 +359,30 @@ input[type="text"], input[type="password"], input[type="date"], textarea {
   min-width: 0;
   min-height: 48px;
 }
-/* Some mobile browsers give the native date control an intrinsic content
-   width that ignores width:100% on its own; min-width:0 on the field and
-   its flex ancestors lets it actually shrink to fit the screen instead of
-   pushing past the right edge. */
+/* Some mobile browsers (notably iOS Safari) give the native date control
+   an intrinsic content width that simply ignores width:100%/max-width, so
+   the CSS width alone can't be trusted to contain it. Two layers of
+   defense: min-width:0 on the field and its flex ancestors so nothing
+   upstream blocks it from shrinking, and appearance:none on the input
+   itself to drop the UA's own native sizing in favor of ours. The
+   .date-field-wrap is the hard backstop — width:100% + overflow:hidden
+   on a plain block element can't be overridden by an inner control's
+   intrinsic size the way a bare input's own width sometimes is, so even
+   in a browser that still ignores our width on the input, the wrapper
+   guarantees the page itself never gets pushed past the viewport edge. */
 .field, .post-form { min-width: 0; }
-input[type="date"] { min-width: 0; }
+.date-field-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--shape-sm);
+}
+input[type="date"] {
+  min-width: 0;
+  display: block;
+  -webkit-appearance: none;
+  appearance: none;
+}
 textarea { min-height: unset; font-family: var(--font-ja); font-style: normal; font-size: .95rem; }
 input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(255,95,160,.22); }
 /* Custom file field: the native input is visually hidden (still fully
@@ -633,6 +663,92 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 .card-actions button .icon { width: 14px; height: 14px; }
 .card-actions button.danger { background: #FFDCE4; color: var(--color-error); border-color: var(--color-error); }
+
+.album-cta { margin-bottom: var(--space-4); }
+
+/* ===== Album ===== */
+.album-modal-card { text-align: center; }
+.album-preview-wrap {
+  width: 100%;
+  max-height: 50vh;
+  overflow: auto;
+  border-radius: var(--shape-md);
+  border: var(--line-thin) solid var(--color-ink);
+  margin: var(--space-3) 0;
+  background: #fff;
+}
+.album-preview-wrap img { width: 100%; display: block; }
+
+/* Off-screen collage source that html2canvas photographs. Fixed pixel
+   width (not responsive) so the exported image has a consistent, readable
+   layout regardless of the viewport it was generated from. Pushed far
+   outside the viewport rather than display:none, since html2canvas needs
+   the node actually laid out to capture it. */
+.album-render {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 900px;
+  padding: 56px;
+  background-color: var(--color-bg);
+  background-image: url('bg-checker.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center top;
+  font-family: var(--font-body);
+}
+.album-header { text-align: center; margin-bottom: 44px; }
+.album-logo { width: 280px; margin: 0 auto 14px; display: block; }
+.album-title {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+}
+.album-card {
+  background: var(--color-surface);
+  border: 3px solid var(--color-ink);
+  border-radius: var(--shape-md);
+  box-shadow: 6px 6px 0 rgba(26,26,26,.18);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.album-card-b { background: #FFF0F7; }
+.album-card-c { background: #EAF8FF; }
+.album-card-img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: var(--shape-sm);
+  border: 2px solid var(--color-ink);
+}
+.album-card-date { font-size: .85rem; font-weight: 700; color: var(--color-tertiary); font-style: italic; }
+.album-card-text {
+  font-family: var(--font-ja);
+  font-style: normal;
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--color-ink);
+  overflow-wrap: break-word;
+}
+.album-footer {
+  text-align: center;
+  margin-top: 44px;
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--color-ink-soft);
+}
 
 /* ===== Bottom nav ===== */
 .bottom-nav {

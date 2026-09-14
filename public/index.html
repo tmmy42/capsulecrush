@@ -10,6 +10,13 @@
 </head>
 <body>
 
+<!-- Warped checkerboard ground as a dedicated fixed-position layer (not a
+     body background-attachment:fixed image) so it always covers the full
+     device screen — including behind the status bar/notch — regardless of
+     mobile Safari's dynamic toolbar resizing, which has a long-standing bug
+     failing to repaint fixed body backgrounds correctly in that situation. -->
+<div class="bg-checker-layer" aria-hidden="true"></div>
+
 <!-- Scattered pixel-art star decorations, sitting above the checkerboard
      background and app content (can overlap the gashapon/buttons) but
      below the grain overlay, bottom nav, and modals -->
@@ -266,7 +273,9 @@
           <svg class="icon icon-inline" aria-hidden="true"><use href="#icon-calendar"/></svg>
           Date <span class="hint">optional</span>
         </label>
-        <input type="date" id="post-date" />
+        <div class="date-field-wrap">
+          <input type="date" id="post-date" />
+        </div>
       </div>
 
       <div class="field">
@@ -299,8 +308,34 @@
       <p id="list-empty-text">No capsules yet — start your collection.</p>
       <button class="btn btn-secondary" data-nav="post">Add Your First Capsule!!</button>
     </div>
+    <button id="btn-create-album" class="btn btn-tertiary btn-block album-cta hidden">
+      <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"/></svg>
+      Create Album
+    </button>
     <div id="list-grid" class="list-grid"></div>
   </section>
+
+  <!-- Album modal: preview of the generated collage, with download/share -->
+  <div id="album-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Your album">
+    <div class="modal-card album-modal-card">
+      <button class="icon-btn modal-close" id="album-close" aria-label="Close">
+        <svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg>
+      </button>
+      <p class="crop-title">Your Album</p>
+      <div class="album-preview-wrap">
+        <img id="album-preview-img" alt="Generated album collage" />
+      </div>
+      <div class="post-actions">
+        <button type="button" class="btn btn-ghost" id="album-download">Download</button>
+        <button type="button" class="btn btn-primary" id="album-share">Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Off-screen collage layout that html2canvas renders — kept in normal
+       DOM flow (not display:none) so it actually lays out, just pushed
+       far outside the viewport instead -->
+  <div id="album-render" class="album-render" aria-hidden="true"></div>
 
   <!-- Crop modal: shown right after picking a photo, before upload -->
   <div id="crop-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Crop photo">
@@ -345,6 +380,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
