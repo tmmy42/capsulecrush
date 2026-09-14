@@ -88,14 +88,17 @@ body {
   background-attachment: fixed;
 }
 
-/* Scattered pixel-art stars: sits above the checkerboard background and
-   normal app content (allowed to overlap the gashapon/buttons per the
-   design brief) but stays below the bottom nav and modals so those
-   remain clean */
+/* Scattered pixel-art stars: sits above the plain checkerboard body
+   background but below #app and everything in it. Deliberately no
+   z-index here (stays at the default "auto" stack level) — the
+   browser promotes body's own background to paint the canvas, which
+   sits below literally everything including z-index:-1 elements, so a
+   negative z-index would make this invisible. With z-index:auto,
+   plain DOM order decides paint order instead: this div comes before
+   #app in the HTML, so #app (and everything in it) paints on top. */
 .stars-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2;
   pointer-events: none;
   background-image: url('bg-stars.svg');
   background-repeat: no-repeat;
