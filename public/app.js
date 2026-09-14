@@ -850,19 +850,14 @@
         await document.fonts.ready;
       }
 
-      // html2canvas only captures pixels inside the target element's own
-      // box — a child that overflows past the right edge (long names +
-      // the accent blades, or the tagline + its icon) gets silently cut
-      // off in the output, even though nothing here sets overflow:hidden.
-      // Force each heading line to a single line, measure its natural
-      // width against the padded content area, and shrink it to fit by
-      // directly reducing font-size (and the accent/tagline icon sizes
-      // by the same ratio) rather than CSS transform:scale — html2canvas
-      // doesn't reliably honor transforms, but plain font-size changes
-      // are normal layout and render correctly.
-      const containerStyle = getComputedStyle(container);
-      const availableWidth =
-        container.clientWidth - parseFloat(containerStyle.paddingLeft) - parseFloat(containerStyle.paddingRight);
+      // The album is always laid out at this one canonical size — never
+      // measured from the live device viewport — so its content fits the
+      // same way regardless of what screen generated it. (900px width,
+      // 56px padding each side, both fixed in .album-render's own CSS.)
+      const ALBUM_WIDTH = 900;
+      const ALBUM_PADDING = 56;
+      const ALBUM_LEFT_OFFSET = -1200;
+      const availableWidth = ALBUM_WIDTH - ALBUM_PADDING * 2;
       const shrinkLineToFit = (el) => {
         if (!el) return;
         el.style.whiteSpace = "nowrap";
@@ -887,10 +882,23 @@
       shrinkLineToFit(container.querySelector(".album-names"));
       shrinkLineToFit(container.querySelector(".album-tagline"));
 
+      // html2canvas defaults its internal render window to the real
+      // device's viewport size unless told otherwise — on a narrow phone
+      // that can misjudge this off-screen, fixed-width element's true
+      // position/size and clip content near its edges. windowWidth/
+      // windowHeight pin its clone to a canonical size, independent of
+      // whatever screen triggered the generation, while still capturing
+      // based on the target element's own bounding box (the default
+      // behavior — an explicit x/y/width/height region was tried here
+      // first but didn't line up with html2canvas's own coordinate
+      // space and produced a blank capture, so that was dropped).
+      const contentHeight = container.scrollHeight;
       const canvas = await html2canvas(container, {
         backgroundColor: "#CBF3DC",
         scale: 2,
         useCORS: true,
+        windowWidth: ALBUM_WIDTH - ALBUM_LEFT_OFFSET + 400,
+        windowHeight: Math.max(1600, contentHeight + 400),
       });
 
       albumBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));

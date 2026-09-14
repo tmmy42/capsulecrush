@@ -711,14 +711,20 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .album-download-fallback { margin-top: var(--space-3); }
 
 /* Off-screen collage source that html2canvas photographs. Fixed pixel
-   width (not responsive) so the exported image has a consistent, readable
-   layout regardless of the viewport it was generated from. Pushed far
-   outside the viewport rather than display:none, since html2canvas needs
-   the node actually laid out to capture it. */
+   width (not responsive) so the exported image has a consistent,
+   desktop-equivalent layout regardless of the device it was generated
+   on — never scaled or reflowed by the real viewport. position:absolute
+   (not fixed) and a modest -1200px offset, matched by explicit x/
+   windowWidth options on the html2canvas() call in app.js: html2canvas
+   defaults its internal clone's "window" size to the real device
+   viewport, which on a narrow phone can misjudge where/how wide this
+   element is relative to that clone and clip content near its right
+   edge — passing explicit capture geometry removes that dependency
+   entirely instead of relying on the live viewport at capture time. */
 .album-render {
-  position: fixed;
+  position: absolute;
   top: 0;
-  left: -10000px;
+  left: -1200px;
   width: 900px;
   padding: 56px;
   background-color: var(--color-bg);
