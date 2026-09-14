@@ -118,6 +118,34 @@ app.get("/api/auth/me", requireAuth, async (c) => {
   return c.json({ username: user.username, partner_name: user.partner_name, background_theme: user.background_theme });
 });
 
+app.put("/api/auth/profile", requireAuth, async (c) => {
+  const userId = c.get("userId");
+  const body = await c.req.json().catch(() => ({}));
+  const { username, partner_name } = body;
+
+  if (!isValidUsername(username)) {
+    return c.json({ error: "Your name must be 3-32 characters (letters, numbers, underscore)" }, 400);
+  }
+  if (!isValidPartnerName(partner_name)) {
+    return c.json({ error: "Their name must be 1-64 characters" }, 400);
+  }
+
+  const existing = await c.env.DB.prepare(`SELECT id FROM users WHERE username = ? AND id != ?`)
+    .bind(username, userId)
+    .first();
+  if (existing) {
+    return c.json({ error: "That username is already taken" }, 409);
+  }
+
+  const partnerName = partner_name.trim();
+  const passcodeHash = await sha256Hex(partnerName);
+  await c.env.DB.prepare(`UPDATE users SET username = ?, partner_name = ?, passcode_hash = ? WHERE id = ?`)
+    .bind(username, partnerName, passcodeHash, userId)
+    .run();
+
+  return c.json({ username, partner_name: partnerName });
+});
+
 app.put("/api/auth/theme", requireAuth, async (c) => {
   const userId = c.get("userId");
   const body = await c.req.json().catch(() => ({}));

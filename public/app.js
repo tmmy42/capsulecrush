@@ -113,7 +113,7 @@
     if (name === "home") refreshHome();
     if (name === "list") refreshList();
     if (name === "post" && !state.editingId) resetPostForm();
-    if (name === "settings") renderThemeGrid();
+    if (name === "settings") renderSettingsScreen();
     requestAnimationFrame(updateScrollHint);
   }
 
@@ -250,26 +250,40 @@
 
   // ---------- settings / background theme ----------
 
-  function renderThemeGrid() {
-    const grid = $("#theme-grid");
-    grid.innerHTML = "";
+  // Shared swatch-grid builder — used both for the persistent Settings
+  // theme picker and the one-off album-background picker in the album
+  // setup modal, which has its own separate (non-persisted) selection.
+  function buildThemeSwatchGrid(container, selectedId, onSelect) {
+    container.innerHTML = "";
     Object.entries(BACKGROUND_THEMES).forEach(([id, cfg]) => {
       const swatch = document.createElement("button");
       swatch.type = "button";
-      swatch.className = "theme-swatch" + (id === state.backgroundTheme ? " active" : "");
+      swatch.className = "theme-swatch" + (id === selectedId ? " active" : "");
       const gradient = `linear-gradient(135deg, ${cfg.previewColors[0]} 50%, ${cfg.previewColors[1]} 50%)`;
       swatch.innerHTML = `
         <div class="theme-swatch-preview" style="background:${gradient}">
           <div class="theme-swatch-dots">
             ${cfg.dotColors.map((c) => `<span style="background:${c}"></span>`).join("")}
           </div>
-          <span class="theme-swatch-check"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span>
         </div>
+        <span class="theme-swatch-check"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span>
         <span>${escapeHtml(cfg.label)}</span>
       `;
-      swatch.addEventListener("click", () => selectBackgroundTheme(id));
-      grid.appendChild(swatch);
+      swatch.addEventListener("click", () => onSelect(id));
+      container.appendChild(swatch);
     });
+  }
+
+  function renderThemeGrid() {
+    buildThemeSwatchGrid($("#theme-grid"), state.backgroundTheme, selectBackgroundTheme);
+  }
+
+  function renderSettingsScreen() {
+    renderThemeGrid();
+    $("#profile-username").value = state.username || "";
+    $("#profile-partner-name").value = state.partnerName || "";
+    $("#profile-error").textContent = "";
+    $("#profile-success").classList.add("hidden");
   }
 
   async function selectBackgroundTheme(themeId) {
@@ -288,6 +302,39 @@
       alert("Couldn't save that background: " + err.message);
     }
   }
+
+  // ---------- settings / profile ----------
+
+  $("#form-profile").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorEl = $("#profile-error");
+    const successEl = $("#profile-success");
+    errorEl.textContent = "";
+    successEl.classList.add("hidden");
+    const submitBtn = $("#profile-submit");
+    submitBtn.disabled = true;
+    try {
+      const username = $("#profile-username").value.trim();
+      const partner_name = $("#profile-partner-name").value.trim();
+      const data = await api("/api/auth/profile", {
+        method: "PUT",
+        body: JSON.stringify({ username, partner_name }),
+      });
+      // The session token is tied to the account, not the credentials, so
+      // this takes effect immediately without needing to log back in —
+      // only the next login will require the new "their name" passcode.
+      state.username = data.username;
+      state.partnerName = data.partner_name;
+      localStorage.setItem("cc_username", data.username);
+      localStorage.setItem("cc_partner_name", data.partner_name);
+      applyPersonalization();
+      successEl.classList.remove("hidden");
+    } catch (err) {
+      errorEl.textContent = err.message;
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
 
   // ---------- home / gasha ----------
 
@@ -610,9 +657,9 @@
   // ---------- album ----------
 
   let albumBlob = null;
+  let albumSetupTheme = DEFAULT_THEME;
 
-  function buildAlbumMarkup(capsules, partnerName) {
-    const name = escapeHtml(partnerName || "them");
+  function buildAlbumMarkup(capsules, fromName, toName) {
     const bgClasses = ["", "album-card-b", "album-card-c"];
     const cards = capsules
       .map((c, i) => {
@@ -632,26 +679,44 @@
       })
       .join("");
 
+    // No wordmark here on purpose — the gift is the from/to pairing and
+    // the collected memories, not a branded template.
     return `
       <div class="album-header">
-        <img src="logo.png" class="album-logo" alt="" />
-        <div class="album-title">Favorite things about ${name} &#9829;</div>
+        <div class="album-names">${escapeHtml(fromName)} <span class="album-names-to">to</span> ${escapeHtml(toName)}</div>
+        <div class="album-tagline">Things I love about you&hellip;</div>
       </div>
       <div class="album-grid">${cards}</div>
-      <div class="album-footer">Made with CapsuleCrush &#9829;</div>
     `;
   }
 
-  async function generateAlbum() {
+  function renderAlbumThemeGrid() {
+    buildThemeSwatchGrid($("#album-theme-grid"), albumSetupTheme, (id) => {
+      albumSetupTheme = id;
+      renderAlbumThemeGrid();
+    });
+  }
+
+  function openAlbumSetup() {
     if (state.capsules.length === 0) return;
-    const btn = $("#btn-create-album");
+    $("#album-from-name").value = state.username || "";
+    $("#album-to-name").value = state.partnerName || "";
+    albumSetupTheme = state.backgroundTheme;
+    renderAlbumThemeGrid();
+    $("#album-setup-modal").classList.remove("hidden");
+  }
+
+  async function generateAlbum(fromName, toName, themeId) {
+    const btn = $("#album-setup-generate");
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-rotate"/></svg> Generating...`;
 
     const container = $("#album-render");
     try {
-      container.innerHTML = buildAlbumMarkup(state.capsules, state.partnerName);
+      const theme = BACKGROUND_THEMES[themeId] || BACKGROUND_THEMES[DEFAULT_THEME];
+      container.style.backgroundImage = `url('${theme.checkerUrl}')`;
+      container.innerHTML = buildAlbumMarkup(state.capsules, fromName || "me", toName || "you");
 
       const imgs = Array.from(container.querySelectorAll("img"));
       await Promise.all(
@@ -676,6 +741,7 @@
 
       albumBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
       $("#album-preview-img").src = URL.createObjectURL(albumBlob);
+      $("#album-setup-modal").classList.add("hidden");
       $("#album-modal").classList.remove("hidden");
     } catch (err) {
       alert("Couldn't create the album: " + err.message);
@@ -686,7 +752,13 @@
     }
   }
 
-  $("#btn-create-album").addEventListener("click", generateAlbum);
+  $("#btn-create-album").addEventListener("click", openAlbumSetup);
+  $("#album-setup-close").addEventListener("click", () => $("#album-setup-modal").classList.add("hidden"));
+  $("#album-setup-generate").addEventListener("click", () => {
+    const fromName = $("#album-from-name").value.trim();
+    const toName = $("#album-to-name").value.trim();
+    generateAlbum(fromName, toName, albumSetupTheme);
+  });
   $("#album-close").addEventListener("click", () => $("#album-modal").classList.add("hidden"));
 
   $("#album-download").addEventListener("click", () => {

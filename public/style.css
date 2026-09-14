@@ -461,6 +461,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 
 .form-error { color: var(--color-error); font-weight: 600; font-size: .85rem; min-height: 1.2em; margin: var(--space-2) 0 0; font-style: normal; }
+.form-success { color: var(--color-tertiary-deep); font-weight: 600; font-size: .85rem; margin: var(--space-2) 0 0; font-style: normal; }
 
 /* ===== Gasha home ===== */
 .gasha-stage {
@@ -693,6 +694,9 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .album-cta { margin-bottom: var(--space-4); }
 
 /* ===== Album ===== */
+.album-setup-card { text-align: left; }
+.album-setup-theme-label { margin: var(--space-2) 0 var(--space-2); }
+.album-setup-card .theme-grid { margin-bottom: var(--space-2); }
 .album-modal-card { text-align: center; }
 .album-preview-wrap {
   width: 100%;
@@ -717,20 +721,36 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   width: 900px;
   padding: 56px;
   background-color: var(--color-bg);
-  background-image: url('bg-checker.svg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center top;
   font-family: var(--font-body);
 }
+/* Recipient-first header: no wordmark — the two names being connected
+   are the whole point of a gift like this, so they carry the visual
+   weight a logo used to. */
 .album-header { text-align: center; margin-bottom: 44px; }
-.album-logo { width: 280px; margin: 0 auto 14px; display: block; }
-.album-title {
+.album-names {
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 600;
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: var(--color-primary);
+  line-height: 1.25;
+}
+.album-names-to {
+  color: var(--color-ink);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0 14px;
+}
+.album-tagline {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.4rem;
+  color: var(--color-ink-soft);
+  margin-top: 10px;
 }
 .album-grid {
   display: grid;
@@ -778,6 +798,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 
 /* ===== Settings ===== */
 .settings-section-label { font-weight: 700; font-size: 1rem; margin: 0 0 2px; }
+.settings-section-label-spaced { margin-top: var(--space-6); }
 .settings-section-hint { color: var(--color-ink-soft); font-size: .85rem; margin: 0 0 var(--space-4); }
 
 .theme-grid {
@@ -830,12 +851,18 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(255,95,160,.25), var(--elev-1);
 }
+/* A direct child of the button (not of .theme-swatch-preview, which has
+   overflow:hidden for the color swatch itself) so the badge — perched at
+   the corner of the preview box — is never clipped. Sized with enough
+   margin around the icon that the checkmark stays fully inside its own
+   circle at any zoom level, rather than relying on overflow to hide any
+   spillover. */
 .theme-swatch-check {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 26px;
-  height: 26px;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--color-primary);
   color: var(--color-on-primary);
@@ -843,8 +870,9 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   display: none;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--elev-1);
 }
-.theme-swatch-check .icon { width: 14px; height: 14px; stroke-width: 3; }
+.theme-swatch-check .icon { width: 12px; height: 12px; stroke-width: 3; }
 .theme-swatch.active .theme-swatch-check { display: flex; }
 
 /* ===== Bottom nav ===== */

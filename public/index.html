@@ -333,10 +333,59 @@
       <span class="topbar-spacer" aria-hidden="true"></span>
     </header>
 
-    <p class="settings-section-label">Background</p>
+    <p class="settings-section-label">Theme</p>
     <p class="settings-section-hint">Same patterns, your pick of colors.</p>
     <div id="theme-grid" class="theme-grid"></div>
+
+    <p class="settings-section-label settings-section-label-spaced">Your Info</p>
+    <p class="settings-section-hint">Used to log in — changing "their name" changes your passcode too.</p>
+    <form id="form-profile" class="post-form">
+      <div class="field">
+        <label class="field-label" for="profile-username">Your name</label>
+        <input type="text" id="profile-username" autocomplete="username" required maxlength="32" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="profile-partner-name">Their name <span class="hint">also your passcode</span></label>
+        <input type="text" id="profile-partner-name" required maxlength="64" />
+      </div>
+      <div class="post-actions">
+        <button type="submit" class="btn btn-primary" id="profile-submit">Save Changes</button>
+      </div>
+      <p class="form-error" id="profile-error" role="alert"></p>
+      <p class="form-success hidden" id="profile-success" role="status">Saved!</p>
+    </form>
   </section>
+
+  <!-- Album setup modal: lets the user pick the from/to names shown on the
+       album itself (independent of their login info) and a background
+       color theme for it, before the collage is generated -->
+  <div id="album-setup-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Set up your album">
+    <div class="modal-card album-setup-card">
+      <button class="icon-btn modal-close" id="album-setup-close" aria-label="Close">
+        <svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg>
+      </button>
+      <p class="crop-title">Create Album</p>
+
+      <div class="field">
+        <label class="field-label" for="album-from-name">From</label>
+        <input type="text" id="album-from-name" maxlength="32" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="album-to-name">To</label>
+        <input type="text" id="album-to-name" maxlength="64" />
+      </div>
+
+      <p class="field-label album-setup-theme-label">Background</p>
+      <div id="album-theme-grid" class="theme-grid"></div>
+
+      <div class="post-actions">
+        <button type="button" class="btn btn-primary btn-block" id="album-setup-generate">
+          <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"/></svg>
+          Generate Album
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Album modal: preview of the generated collage, with download/share -->
   <div id="album-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Your album">
