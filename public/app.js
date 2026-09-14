@@ -681,39 +681,40 @@
   // actual <img> elements (data URIs included) reliably via plain
   // drawImage.
   function buildTaglineIcon() {
-    // Simpler 4-lobe cloud (fewer bumps than the first attempt) sized up,
-    // with two trailing circles running diagonally down-left from it —
-    // bigger near the cloud, smaller further away.
+    // A simpler 3-4 lobe cloud (three rounded arcs — left, top, right —
+    // plus a flat bottom edge, rather than the earlier 6-segment bezier
+    // outline which read as too fussy). The cloud sits lower in its own
+    // viewBox, and the two trailing circles are spaced much further
+    // southwest of it — bigger one closer, smaller one further out.
     const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42">` +
-      `<path d="M10,20 C4,20 4,13 10,11 C9,4 19,1 24,6 C31,3 36,9 32,13 ` +
-      `C37,14 36,20 30,20 C30,24 22,25 18,23 C13,25 10,23 10,20 Z" ` +
+      `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="52" viewBox="0 0 40 52">` +
+      `<path d="M9,26 A5,5 0 0 1 9,16 A7,7 0 0 1 23,14 A6,6 0 0 1 33,21 A5,5 0 0 1 30,26 Z" ` +
       `fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2" stroke-linejoin="round"/>` +
-      `<circle cx="8" cy="31" r="4.5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>` +
-      `<circle cx="3" cy="38" r="2.6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>` +
+      `<circle cx="9" cy="37" r="5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>` +
+      `<circle cx="1" cy="47" r="2.8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>` +
       `</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-tagline-icon" src="${dataUri}" width="40" height="42" alt="" />`;
+    return `<img class="album-tagline-icon" src="${dataUri}" width="40" height="52" alt="" />`;
   }
 
-  // Diagonal accent "speed line" flanking each side of the from/to names —
-  // colored to match the names' own fill/stroke. Drawn as two overlapping
-  // <line> strokes (a wide one in the stroke color, a narrower one in the
-  // fill color on top) rather than a filled+outlined shape, which is a
-  // simpler way to get the same "filled bar with an outline ring" look
-  // for a thin diagonal mark.
-  function buildAccentLine(fillColor, strokeColor, side) {
-    const coords =
-      side === "left" ? { x1: 4, y1: 26, x2: 20, y2: 4 } : { x1: 20, y1: 26, x2: 4, y2: 4 };
-    const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="30" viewBox="0 0 24 30">` +
-      `<line x1="${coords.x1}" y1="${coords.y1}" x2="${coords.x2}" y2="${coords.y2}" ` +
-      `stroke="${strokeColor}" stroke-width="7" stroke-linecap="round"/>` +
-      `<line x1="${coords.x1}" y1="${coords.y1}" x2="${coords.x2}" y2="${coords.y2}" ` +
-      `stroke="${fillColor}" stroke-width="4" stroke-linecap="round"/>` +
-      `</svg>`;
+  // Double diagonal accent lines flanking each side of the from/to names,
+  // like "\\ Name //" — thin, colored to match the names' own outline
+  // color. Left side leans "\", right side leans "/" (a mirror of the
+  // left pair), framing the text between them.
+  function buildAccentLine(color, side) {
+    const w = 22;
+    const leftPairs = [
+      [4, 2, 14, 28],
+      [10, 2, 20, 28],
+    ];
+    const pairs =
+      side === "left" ? leftPairs : leftPairs.map(([x1, y1, x2, y2]) => [w - x1, y1, w - x2, y2]);
+    const lines = pairs
+      .map(([x1, y1, x2, y2]) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>`)
+      .join("");
+    const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="30" viewBox="0 0 ${w} 30">${lines}</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-names-accent" src="${dataUri}" width="24" height="30" alt="" />`;
+    return `<img class="album-names-accent" src="${dataUri}" width="${w}" height="30" alt="" />`;
   }
 
   // Faux text-stroke via eight stacked, unblurred text-shadows — far more
@@ -763,11 +764,11 @@
     return `
       <div class="album-header">
         <div class="album-names" style="${nameColorStyle}">
-          ${buildAccentLine(theme.nameFill, theme.nameStroke, "left")}
+          ${buildAccentLine(theme.nameStroke, "left")}
           <span style="${nameFontStyle(fromName)}">${escapeHtml(fromName)}</span>
           <span class="album-names-to">to</span>
           <span style="${nameFontStyle(toName)}">${escapeHtml(toName)}</span>
-          ${buildAccentLine(theme.nameFill, theme.nameStroke, "right")}
+          ${buildAccentLine(theme.nameStroke, "right")}
         </div>
         <div class="album-tagline">Things I love about you&hellip; ${buildTaglineIcon()}</div>
       </div>
