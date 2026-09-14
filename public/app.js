@@ -728,11 +728,14 @@
     // Shifted +3 in x from the first pass to sit closer to the primary
     // blade (narrower gap), y unchanged so the bottom-tip alignment
     // holds.
+    // Shifted +2 more in x from the previous pass, bringing it even
+    // closer to the primary blade. y unchanged so bottom-tip alignment
+    // still holds.
     const outerLeft = [
-      [4, 31],
-      [10, 25],
-      [19, 38],
-      [17, 40],
+      [6, 31],
+      [12, 25],
+      [21, 38],
+      [19, 40],
     ];
     const mirror = (pts) => pts.map(([x, y]) => [w - x, y]);
     const primary = side === "left" ? primaryLeft : mirror(primaryLeft);
