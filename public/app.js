@@ -850,6 +850,43 @@
         await document.fonts.ready;
       }
 
+      // html2canvas only captures pixels inside the target element's own
+      // box — a child that overflows past the right edge (long names +
+      // the accent blades, or the tagline + its icon) gets silently cut
+      // off in the output, even though nothing here sets overflow:hidden.
+      // Force each heading line to a single line, measure its natural
+      // width against the padded content area, and shrink it to fit by
+      // directly reducing font-size (and the accent/tagline icon sizes
+      // by the same ratio) rather than CSS transform:scale — html2canvas
+      // doesn't reliably honor transforms, but plain font-size changes
+      // are normal layout and render correctly.
+      const containerStyle = getComputedStyle(container);
+      const availableWidth =
+        container.clientWidth - parseFloat(containerStyle.paddingLeft) - parseFloat(containerStyle.paddingRight);
+      const shrinkLineToFit = (el) => {
+        if (!el) return;
+        el.style.whiteSpace = "nowrap";
+        for (let attempt = 0; attempt < 4; attempt++) {
+          const natural = el.scrollWidth;
+          if (natural <= availableWidth) break;
+          const ratio = (availableWidth / natural) * 0.95;
+          const ownFontSize = parseFloat(getComputedStyle(el).fontSize);
+          el.style.fontSize = `${ownFontSize * ratio}px`;
+          const toSpan = el.querySelector(".album-names-to");
+          if (toSpan) {
+            const toFontSize = parseFloat(getComputedStyle(toSpan).fontSize);
+            toSpan.style.fontSize = `${toFontSize * ratio}px`;
+          }
+          el.querySelectorAll("img").forEach((img) => {
+            const rect = img.getBoundingClientRect();
+            img.style.width = `${rect.width * ratio}px`;
+            img.style.height = `${rect.height * ratio}px`;
+          });
+        }
+      };
+      shrinkLineToFit(container.querySelector(".album-names"));
+      shrinkLineToFit(container.querySelector(".album-tagline"));
+
       const canvas = await html2canvas(container, {
         backgroundColor: "#CBF3DC",
         scale: 2,
