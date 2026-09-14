@@ -722,11 +722,14 @@
       [46, 38],
       [42, 40],
     ];
+    // Same shape/angle as before, just translated straight down (x
+    // unchanged) so its bottom tip lines up with the primary blade's
+    // bottom edge (y 38/40) instead of sitting up near the top.
     const outerLeft = [
-      [1, 7],
-      [7, 1],
-      [16, 14],
-      [14, 16],
+      [1, 31],
+      [7, 25],
+      [16, 38],
+      [14, 40],
     ];
     const mirror = (pts) => pts.map(([x, y]) => [w - x, y]);
     const primary = side === "left" ? primaryLeft : mirror(primaryLeft);
