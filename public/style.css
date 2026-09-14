@@ -754,15 +754,13 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   color: var(--color-ink-soft);
   margin-top: 10px;
 }
-/* Bumpy "mokumoku" cloud/speech-bubble decoration beneath the tagline —
-   sticker-style (bold black outline, flat theme-colored fill), matching
-   the app's illustration language elsewhere. */
-.album-cloud-bubble {
-  width: 200px;
-  height: auto;
-  margin: 8px auto 0;
-  display: block;
-  filter: drop-shadow(0 4px 0 rgba(26,26,26,.12));
+/* Small cloud icon right after the tagline text — theme-colored fill,
+   sized to sit comfortably inline with the tagline's own text height. */
+.album-tagline-icon {
+  width: 26px;
+  height: 26px;
+  vertical-align: -6px;
+  margin-left: 2px;
 }
 .album-grid {
   display: grid;

@@ -671,24 +671,18 @@
   let albumBlob = null;
   let albumSetupTheme = DEFAULT_THEME;
 
-  // A self-contained inline <svg> (no <use>/external symbol refs — those
-  // don't reliably rasterize through html2canvas — confirmed by testing,
-  // an inline <svg> renders fine in-browser but comes out blank in the
-  // captured canvas) for the bumpy "mokumoku" cloud/speech-bubble
-  // decoration under the album tagline. Encoded as a base64 data-URI <img>
-  // instead: html2canvas draws actual <img> elements (svg data URIs
-  // included) via plain drawImage, which it handles reliably, unlike a
-  // raw inline <svg> subtree. Same silhouette style as the earlier
-  // home-screen cloud decoration, recolored per theme.
-  function buildCloudBubbleSvg(fillColor) {
+  // Small Lucide "cloud" icon appended right after the tagline text.
+  // Encoded as a base64 data-URI <img> rather than an inline <svg> —
+  // testing showed html2canvas silently drops raw inline SVG subtrees but
+  // handles actual <img> elements (data URIs included) reliably via plain
+  // drawImage.
+  function buildTaglineIcon(fillColor) {
     const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="128" viewBox="0 0 240 140">` +
-      `<path d="M40,90 C15,90 10,60 30,55 C25,30 60,20 75,38 C85,15 130,12 145,35 ` +
-      `C165,15 205,25 200,55 C225,58 225,90 200,95 C205,115 165,120 145,105 ` +
-      `C125,122 85,122 70,105 C45,115 30,105 40,90 Z" ` +
-      `fill="${fillColor}" stroke="#1A1A1A" stroke-width="5" stroke-linejoin="round"/></svg>`;
+      `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">` +
+      `<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" ` +
+      `fill="${fillColor}" stroke="#1A1A1A" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-cloud-bubble" src="${dataUri}" width="220" height="128" alt="" />`;
+    return `<img class="album-tagline-icon" src="${dataUri}" width="24" height="24" alt="" />`;
   }
 
   // Faux text-stroke via eight stacked, unblurred text-shadows — far more
@@ -726,8 +720,7 @@
     return `
       <div class="album-header">
         <div class="album-names" style="${nameStyle}">${escapeHtml(fromName)} <span class="album-names-to">to</span> ${escapeHtml(toName)}</div>
-        <div class="album-tagline">Things I love about you&hellip;</div>
-        ${buildCloudBubbleSvg(theme.cloudFill)}
+        <div class="album-tagline">Things I love about you&hellip; ${buildTaglineIcon(theme.cloudFill)}</div>
       </div>
       <div class="album-grid">${cards}</div>
     `;
