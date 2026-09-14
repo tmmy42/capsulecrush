@@ -735,8 +735,12 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 /* Recipient-first header: no wordmark — the two names being connected
    are the whole point of a gift like this, so they carry the visual
-   weight a logo used to. */
-.album-header { text-align: center; margin-bottom: 24px; }
+   weight a logo used to. Generous padding on every side is a safety
+   margin for the accent-line/tagline-icon artwork flanking the text —
+   this box has no background of its own, so the padding just reveals
+   more of .album-render's own checkered background underneath rather
+   than creating a visible gap. */
+.album-header { text-align: center; margin-bottom: 24px; padding: 32px; }
 /* Fill/stroke colors are set inline per-generation (they follow the
    chosen album theme — see textOutlineStyle() in app.js); font size and
    weight live here since those don't vary. */

@@ -691,23 +691,15 @@
     // line instead of stacking near-vertically. The whole icon is placed
     // lower via its own CSS vertical-align rather than shifting
     // coordinates here.
-    // The trailing circle at cx=-2 sits close enough to the viewBox's
-    // left edge that its own stroke (which extends outward from the
-    // path, not just along it) landed a fraction of a unit past that
-    // edge — an SVG referenced via <img> always clips to its viewBox
-    // with no way to opt out, so any part of the drawing that pokes past
-    // it is silently gone. A small uniform margin on every side of the
-    // viewBox (below) gives every stroke room without moving the artwork
-    // itself.
     const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-8 -2 64 64">` +
+      `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="-6 0 60 60">` +
       `<path d="M15,34 A6.5,6.5 0 0 1 15,21 A9,9 0 0 1 33,18 A8,8 0 0 1 46,27 A6.5,6.5 0 0 1 42,34 Z" ` +
       `fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round"/>` +
       `<circle cx="8" cy="45" r="5.5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2"/>` +
       `<circle cx="-2" cy="55" r="3" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2"/>` +
       `</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-tagline-icon" src="${dataUri}" width="64" height="64" alt="" />`;
+    return `<img class="album-tagline-icon" src="${dataUri}" width="60" height="60" alt="" />`;
   }
 
   // Diagonal accent "blades" flanking each side of the from/to names,
@@ -719,25 +711,19 @@
   // mitered corners throughout (no rounded caps, no pointed tip) — round
   // line caps on an earlier thick-stroke version extended past the
   // declared viewBox and got silently clipped by the SVG's own default
-  // overflow:hidden. That was fixed by keeping every fill vertex inside
-  // the box with a margin, but the 2px *outline* stroke on these acute-
-  // angled tips still used stroke-linejoin="miter" — at a sharp enough
-  // vertex a miter join spikes out several times the stroke width past
-  // the vertex itself (bounded only by the default stroke-miterlimit),
-  // which can poke past the viewBox and get clipped exactly at the tip.
-  // Chrome and Safari round that boundary slightly differently, so it
-  // could look fine in one and clip in the other. Two independent
-  // safeguards now: "bevel" instead of "miter" (a join that can never
-  // spike beyond ~half the stroke width, regardless of the angle), plus
-  // a small uniform margin baked into the viewBox itself as a backstop.
-  // Left leans "\", right leans "/" (a mirror of the left pair), framing
-  // the text.
+  // overflow:hidden, which this avoids by keeping every vertex safely
+  // inside the box with a margin. Left leans "\", right leans "/" (a
+  // mirror of the left pair), framing the text.
+  //
+  // An attempt to pad this SVG's own viewBox and switch its outline to
+  // stroke-linejoin="bevel" (in case of clipping at sharp corners) made
+  // things visibly worse on a real device — the blade rendered as a
+  // solid blob instead of a crisp tapered line — so that's reverted back
+  // to this exact geometry. Any clipping safety margin now lives one
+  // level up, as padding on the header container in style.css, instead
+  // of inside this SVG.
   function buildAccentLine(fillColor, strokeColor, side) {
-    const shapeW = 48;
-    const shapeH = 44;
-    const margin = 6;
-    const w = shapeW + margin * 2;
-    const h = shapeH + margin * 2;
+    const w = 48;
     const primaryLeft = [
       [20, 10],
       [32, 4],
@@ -759,16 +745,15 @@
       [21, 38],
       [19, 40],
     ];
-    const offset = (pts) => pts.map(([x, y]) => [x + margin, y + margin]);
-    const mirror = (pts) => pts.map(([x, y]) => [shapeW - x, y]);
-    const primary = offset(side === "left" ? primaryLeft : mirror(primaryLeft));
-    const outer = offset(side === "left" ? outerLeft : mirror(outerLeft));
+    const mirror = (pts) => pts.map(([x, y]) => [w - x, y]);
+    const primary = side === "left" ? primaryLeft : mirror(primaryLeft);
+    const outer = side === "left" ? outerLeft : mirror(outerLeft);
     const toAttr = (pts) => pts.map(([x, y]) => `${x},${y}`).join(" ");
     const polygon = (pts) =>
-      `<polygon points="${toAttr(pts)}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" stroke-linejoin="bevel"/>`;
-    const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${polygon(outer)}${polygon(primary)}</svg>`;
+      `<polygon points="${toAttr(pts)}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" stroke-linejoin="miter"/>`;
+    const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="44" viewBox="0 0 ${w} 44">${polygon(outer)}${polygon(primary)}</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-names-accent" src="${dataUri}" width="${w}" height="${h}" alt="" />`;
+    return `<img class="album-names-accent" src="${dataUri}" width="${w}" height="44" alt="" />`;
   }
 
   // Faux text-stroke via eight stacked, unblurred text-shadows — far more
