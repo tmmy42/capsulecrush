@@ -855,32 +855,87 @@
       // same way regardless of what screen generated it. (900px width,
       // 56px padding each side, both fixed in .album-render's own CSS.)
       const ALBUM_WIDTH = 900;
-      const ALBUM_PADDING = 56;
       const ALBUM_LEFT_OFFSET = -1200;
-      const availableWidth = ALBUM_WIDTH - ALBUM_PADDING * 2;
-      const shrinkLineToFit = (el) => {
-        if (!el) return;
+      const containerStyle = getComputedStyle(container);
+      const availableWidth =
+        container.clientWidth - parseFloat(containerStyle.paddingLeft) - parseFloat(containerStyle.paddingRight);
+
+      // `.album-names`/`.album-tagline` are block elements with
+      // `white-space: nowrap` content, so they never wrap on their own —
+      // left at their normal block width (100% of the container) they'll
+      // happily render wider than that box and get sliced off wherever
+      // html2canvas stops capturing. Measuring via scrollWidth is
+      // unreliable here (it can just report the box's own constrained
+      // width back for an overflow:visible block), so instead the element
+      // is temporarily switched to inline-block — which shrinks its box to
+      // fit its actual content — and its real, un-clamped rendered width
+      // is read off of that box directly.
+      const naturalWidthOf = (el) => {
+        const prevDisplay = el.style.display;
+        const prevMaxWidth = el.style.maxWidth;
+        el.style.display = "inline-block";
+        el.style.maxWidth = "none";
+        const width = el.getBoundingClientRect().width;
+        el.style.display = prevDisplay;
+        el.style.maxWidth = prevMaxWidth;
+        return width;
+      };
+
+      // Shrinks `el`'s own font-size (plus an optional secondary span,
+      // e.g. the italic "to", and any flanking accent-line <img>s) in sync
+      // until the measured natural width fits `maxWidth`. Because the
+      // accent images are plain inline siblings of the text (no absolute
+      // positioning), resizing them by the same ratio pulls them back
+      // flush against the now-smaller text for free, via normal inline
+      // flow — no separate repositioning step is needed.
+      const fitLineToWidth = (el, maxWidth, { minScale = 0.4 } = {}) => {
+        if (!el) return 1;
         el.style.whiteSpace = "nowrap";
-        for (let attempt = 0; attempt < 4; attempt++) {
-          const natural = el.scrollWidth;
-          if (natural <= availableWidth) break;
-          const ratio = (availableWidth / natural) * 0.95;
-          const ownFontSize = parseFloat(getComputedStyle(el).fontSize);
-          el.style.fontSize = `${ownFontSize * ratio}px`;
-          const toSpan = el.querySelector(".album-names-to");
-          if (toSpan) {
-            const toFontSize = parseFloat(getComputedStyle(toSpan).fontSize);
-            toSpan.style.fontSize = `${toFontSize * ratio}px`;
-          }
-          el.querySelectorAll("img").forEach((img) => {
-            const rect = img.getBoundingClientRect();
-            img.style.width = `${rect.width * ratio}px`;
-            img.style.height = `${rect.height * ratio}px`;
+        const secondarySpans = Array.from(el.querySelectorAll(".album-names-to"));
+        const imgs = Array.from(el.querySelectorAll("img"));
+        const baseFontSize = parseFloat(getComputedStyle(el).fontSize);
+        const baseSecondarySizes = secondarySpans.map((s) => parseFloat(getComputedStyle(s).fontSize));
+        const baseImgSizes = imgs.map((img) => ({
+          w: parseFloat(getComputedStyle(img).width),
+          h: parseFloat(getComputedStyle(img).height),
+        }));
+
+        let scale = 1;
+        for (let attempt = 0; attempt < 10; attempt++) {
+          const natural = naturalWidthOf(el);
+          if (natural <= maxWidth || scale <= minScale) break;
+          scale = Math.max(minScale, scale * (maxWidth / natural) * 0.96);
+          el.style.fontSize = `${baseFontSize * scale}px`;
+          secondarySpans.forEach((s, i) => {
+            s.style.fontSize = `${baseSecondarySizes[i] * scale}px`;
+          });
+          imgs.forEach((img, i) => {
+            img.style.width = `${baseImgSizes[i].w * scale}px`;
+            img.style.height = `${baseImgSizes[i].h * scale}px`;
           });
         }
+        return scale;
       };
-      shrinkLineToFit(container.querySelector(".album-names"));
-      shrinkLineToFit(container.querySelector(".album-tagline"));
+
+      fitLineToWidth(container.querySelector(".album-names"), availableWidth);
+
+      // The tagline's own English copy never changes length, so shrinking
+      // is usually enough — but as a hard fallback for anything that still
+      // doesn't fit at the minimum readable scale, drop the icon onto its
+      // own centered line below the text instead of letting it run past
+      // the edge.
+      const taglineEl = container.querySelector(".album-tagline");
+      if (taglineEl) {
+        fitLineToWidth(taglineEl, availableWidth, { minScale: 0.55 });
+        if (naturalWidthOf(taglineEl) > availableWidth) {
+          const icon = taglineEl.querySelector(".album-tagline-icon");
+          if (icon) {
+            icon.style.display = "block";
+            icon.style.margin = "6px auto 0";
+          }
+          taglineEl.style.whiteSpace = "normal";
+        }
+      }
 
       // html2canvas defaults its internal render window to the real
       // device's viewport size unless told otherwise — on a narrow phone
