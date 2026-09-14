@@ -734,16 +734,19 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 /* Fill/stroke colors are set inline per-generation (they follow the
    chosen album theme — see textOutlineStyle() in app.js); font size and
    weight live here since those don't vary. */
+/* The from/to names are free-text the user can type in Japanese, so they
+   use the same Japanese-friendly font as every other user-entered text in
+   the app (capsule text, etc.) rather than the Latin display serif. */
 .album-names {
-  font-family: var(--font-heading);
-  font-style: italic;
-  font-weight: 800;
+  font-family: var(--font-ja);
+  font-style: normal;
+  font-weight: 700;
   font-size: 3.4rem;
   line-height: 1.2;
 }
 .album-names-to {
   font-size: 1.9rem;
-  font-weight: 700;
+  font-weight: 500;
   margin: 0 16px;
 }
 .album-tagline {

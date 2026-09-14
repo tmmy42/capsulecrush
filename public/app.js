@@ -671,16 +671,18 @@
   let albumBlob = null;
   let albumSetupTheme = DEFAULT_THEME;
 
-  // Small Lucide "cloud" icon appended right after the tagline text.
+  // Small Lucide "message-circle" (speech bubble) icon appended right
+  // after the tagline text — white fill so the bubble shape itself reads
+  // clearly, with the outline colored from the selected album theme.
   // Encoded as a base64 data-URI <img> rather than an inline <svg> —
   // testing showed html2canvas silently drops raw inline SVG subtrees but
   // handles actual <img> elements (data URIs included) reliably via plain
   // drawImage.
-  function buildTaglineIcon(fillColor) {
+  function buildTaglineIcon(strokeColor) {
     const svgMarkup =
       `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">` +
-      `<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" ` +
-      `fill="${fillColor}" stroke="#1A1A1A" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+      `<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" ` +
+      `fill="#FFFFFF" stroke="${strokeColor}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
     return `<img class="album-tagline-icon" src="${dataUri}" width="24" height="24" alt="" />`;
   }
