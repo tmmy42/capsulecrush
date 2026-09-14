@@ -671,18 +671,18 @@
   let albumBlob = null;
   let albumSetupTheme = DEFAULT_THEME;
 
-  // Small Lucide "message-circle" (speech bubble) icon appended right
-  // after the tagline text — white fill so the bubble shape itself reads
-  // clearly, with the outline colored from the selected album theme.
-  // Encoded as a base64 data-URI <img> rather than an inline <svg> —
-  // testing showed html2canvas silently drops raw inline SVG subtrees but
-  // handles actual <img> elements (data URIs included) reliably via plain
-  // drawImage.
-  function buildTaglineIcon(strokeColor) {
+  // Small Lucide "cloud" icon appended right after the tagline text — a
+  // thought-bubble silhouette (musing over what you love), not a speech
+  // bubble. Fixed black outline / white fill regardless of theme, per
+  // spec. Encoded as a base64 data-URI <img> rather than an inline <svg>
+  // — testing showed html2canvas silently drops raw inline SVG subtrees
+  // but handles actual <img> elements (data URIs included) reliably via
+  // plain drawImage.
+  function buildTaglineIcon() {
     const svgMarkup =
       `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">` +
-      `<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" ` +
-      `fill="#FFFFFF" stroke="${strokeColor}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+      `<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" ` +
+      `fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
     return `<img class="album-tagline-icon" src="${dataUri}" width="24" height="24" alt="" />`;
   }
@@ -694,6 +694,18 @@
     const offsets = ["-2px -2px", "2px -2px", "-2px 2px", "2px 2px", "0 -2px", "0 2px", "-2px 0", "2px 0"];
     const shadow = offsets.map((o) => `${o} 0 ${strokeColor}`).join(", ");
     return `text-shadow: ${shadow};`;
+  }
+
+  // Hiragana, katakana, and CJK ideographs — if a from/to name contains
+  // any, it renders in the app's Japanese font instead of the Latin
+  // display serif, matching every other Japanese text field in the app.
+  function containsJapanese(str) {
+    return /[぀-ヿ㐀-䶿一-鿿ｦ-ﾟ]/.test(str);
+  }
+  function nameFontStyle(text) {
+    return containsJapanese(text)
+      ? "font-family: var(--font-ja); font-style: normal; font-weight: 700;"
+      : "font-family: var(--font-heading); font-style: italic; font-weight: 800;";
   }
 
   function buildAlbumMarkup(capsules, fromName, toName, theme) {
@@ -718,11 +730,15 @@
 
     // No wordmark here on purpose — the gift is the from/to pairing and
     // the collected memories, not a branded template.
-    const nameStyle = `color:${theme.nameFill}; ${textOutlineStyle(theme.nameStroke)}`;
+    const nameColorStyle = `color:${theme.nameFill}; ${textOutlineStyle(theme.nameStroke)}`;
     return `
       <div class="album-header">
-        <div class="album-names" style="${nameStyle}">${escapeHtml(fromName)} <span class="album-names-to">to</span> ${escapeHtml(toName)}</div>
-        <div class="album-tagline">Things I love about you&hellip; ${buildTaglineIcon(theme.cloudFill)}</div>
+        <div class="album-names" style="${nameColorStyle}">
+          <span style="${nameFontStyle(fromName)}">${escapeHtml(fromName)}</span>
+          <span class="album-names-to">to</span>
+          <span style="${nameFontStyle(toName)}">${escapeHtml(toName)}</span>
+        </div>
+        <div class="album-tagline">Things I love about you&hellip; ${buildTaglineIcon()}</div>
       </div>
       <div class="album-grid">${cards}</div>
     `;
