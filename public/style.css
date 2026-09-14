@@ -88,6 +88,21 @@ body {
   background-attachment: fixed;
 }
 
+/* Scattered pixel-art stars: sits above the checkerboard background and
+   normal app content (allowed to overlap the gashapon/buttons per the
+   design brief) but stays below the bottom nav and modals so those
+   remain clean */
+.stars-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: url('bg-stars.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center top;
+}
+
 /* Vintage film-grain overlay: fixed above everything, ignores input */
 .grain-overlay {
   position: fixed;

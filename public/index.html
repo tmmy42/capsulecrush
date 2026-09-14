@@ -9,6 +9,11 @@
 </head>
 <body>
 
+<!-- Scattered pixel-art star decorations, sitting above the checkerboard
+     background and app content (can overlap the gashapon/buttons) but
+     below the grain overlay, bottom nav, and modals -->
+<div class="stars-overlay" aria-hidden="true"></div>
+
 <!-- Subtle film-grain overlay for a vintage, less-flat finish -->
 <div class="grain-overlay" aria-hidden="true"></div>
 
@@ -174,7 +179,10 @@
           <g clip-path="url(#band-cap)"><rect x="0" y="0" width="220" height="34" fill="url(#grad-cap)"/></g>
 
           <rect x="100" y="147" width="20" height="7" rx="3" fill="#1A1A1A" opacity=".7"/>
-          <rect x="80" y="240" width="60" height="12" rx="6" fill="#1A1A1A" opacity=".22"/>
+          <!-- dispensing slot: a rounded arch (flat bottom, domed top)
+               sitting near the bottom of the body, just above the base --
+               where a pulled capsule would come out -->
+          <path d="M88,228 L88,216 A22,22 0 0 1 132,216 L132,228 Z" fill="#1A1A1A" opacity=".32" stroke="#1A1A1A" stroke-width="1.6"/>
 
           <!-- candy pile: uniform-size balls in an irregular (non-pyramid)
                cluster. The bottom row's centers sit exactly r above y=144
