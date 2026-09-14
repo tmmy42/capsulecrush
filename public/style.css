@@ -750,14 +750,13 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   font-weight: 700;
   margin: 0 16px;
 }
-/* Double diagonal accent bars flanking the names, filled+outlined to
-   match the name text's own colors — sized big and steep against the
-   3.4rem name text next to them so the "framing" reads clearly. */
+/* Tapered diagonal accent blade flanking each side of the names, filled
+   + thin-outlined to match the name text's own colors. */
 .album-names-accent {
-  width: 30px;
-  height: 38px;
-  vertical-align: -6px;
-  margin: 0 4px;
+  width: 26px;
+  height: 34px;
+  vertical-align: -4px;
+  margin: 0 2px;
 }
 .album-tagline {
   font-family: var(--font-heading);
@@ -769,11 +768,12 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 /* Thought-bubble icon right after the tagline text — fixed black
    outline / white fill, sized to sit comfortably inline with the
-   tagline's own text height. */
+   tagline's own text height, nudged further down than plain inline
+   alignment would place it. */
 .album-tagline-icon {
   width: 34px;
-  height: 38px;
-  vertical-align: -14px;
+  height: 34px;
+  vertical-align: -20px;
   margin-left: 2px;
 }
 .album-grid {

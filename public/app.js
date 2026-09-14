@@ -682,45 +682,47 @@
   // drawImage.
   function buildTaglineIcon() {
     // A simple 3-lobe cloud (three rounded arcs — left, top, right — plus
-    // a flat bottom edge), sized up from the previous pass. The near
-    // trailing circle sits further left of the cloud's bottom edge, and
-    // the far circle continues that same down-left diagonal rather than
-    // dropping straight down — so cloud -> circle -> circle reads as one
-    // flowing diagonal line, not a vertically stacked column.
+    // a flat bottom edge). The two trailing circles sit further left of
+    // the cloud (viewBox extended into negative x to make room), so
+    // cloud -> near circle -> far circle flows as one diagonal down-left
+    // line instead of stacking near-vertically. The whole icon is placed
+    // lower via its own CSS vertical-align rather than shifting
+    // coordinates here.
     const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="54" height="60" viewBox="0 0 54 60">` +
+      `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="-6 0 60 60">` +
       `<path d="M15,34 A6.5,6.5 0 0 1 15,21 A9,9 0 0 1 33,18 A8,8 0 0 1 46,27 A6.5,6.5 0 0 1 42,34 Z" ` +
       `fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round"/>` +
-      `<circle cx="13" cy="45" r="5.5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2"/>` +
-      `<circle cx="4" cy="55" r="3" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2"/>` +
+      `<circle cx="8" cy="45" r="5.5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2"/>` +
+      `<circle cx="-2" cy="55" r="3" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.2"/>` +
       `</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-tagline-icon" src="${dataUri}" width="54" height="60" alt="" />`;
+    return `<img class="album-tagline-icon" src="${dataUri}" width="60" height="60" alt="" />`;
   }
 
-  // Double diagonal accent "bars" flanking each side of the from/to
-  // names, like "\\\\ Name //" — each bar drawn as a filled band with its
-  // own outline (a wide stroke in the outline color, a narrower one in
-  // the fill color on top), matching the fill/outline used for "to's"
-  // name text. Left side leans "\", right leans "/" (a mirror of the
-  // left pair), steeply angled so the pair reads clearly as framing the
-  // text rather than a subtle flourish.
+  // Diagonal accent "blade" flanking each side of the from/to names, like
+  // "\\ Name /" — a single tapered polygon per side (wide flat top edge,
+  // coming to a sharp point at the bottom) rather than a uniform-width
+  // stroke, with a thin outline for definition. Sharp mitered corners
+  // throughout (no rounded caps) — round line caps on the earlier
+  // thick-stroke version extended past the declared viewBox and got
+  // silently clipped by the SVG's own default overflow:hidden, which
+  // this avoids by keeping every vertex safely inside the box with a
+  // 2-4px margin. Left leans "\", right leans "/" (a mirror of the left
+  // shape), framing the text.
   function buildAccentLine(fillColor, strokeColor, side) {
     const w = 34;
-    const leftPairs = [
-      [4, 6, 22, 38],
-      [16, 6, 34, 38],
+    const leftPoints = [
+      [3, 11],
+      [15, 5],
+      [27, 40],
     ];
-    const pairs =
-      side === "left" ? leftPairs : leftPairs.map(([x1, y1, x2, y2]) => [w - x1, y1, w - x2, y2]);
-    const bars = pairs
-      .map(
-        ([x1, y1, x2, y2]) =>
-          `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${strokeColor}" stroke-width="11" stroke-linecap="round"/>` +
-          `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${fillColor}" stroke-width="6" stroke-linecap="round"/>`
-      )
-      .join("");
-    const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="44" viewBox="0 0 ${w} 44">${bars}</svg>`;
+    const points =
+      side === "left" ? leftPoints : leftPoints.map(([x, y]) => [w - x, y]);
+    const pointsAttr = points.map(([x, y]) => `${x},${y}`).join(" ");
+    const svgMarkup =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="44" viewBox="0 0 ${w} 44">` +
+      `<polygon points="${pointsAttr}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" stroke-linejoin="miter"/>` +
+      `</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
     return `<img class="album-names-accent" src="${dataUri}" width="${w}" height="44" alt="" />`;
   }
