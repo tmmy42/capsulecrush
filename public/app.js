@@ -702,31 +702,39 @@
     return `<img class="album-tagline-icon" src="${dataUri}" width="60" height="60" alt="" />`;
   }
 
-  // Diagonal accent "blade" flanking each side of the from/to names, like
-  // "\\ Name /" — a single tapered polygon per side (wide flat top edge,
-  // narrower flat bottom edge — a trapezoid, not a point) rather than a
-  // uniform-width stroke, with a thin outline for definition. Sharp
+  // Diagonal accent "blades" flanking each side of the from/to names,
+  // like "\\ Name /" — two tapered polygons per side (wide flat top
+  // edge, narrower flat bottom edge — a trapezoid, not a point), a
+  // primary blade plus a shorter, steeper-angled one further outside it
+  // (away from the text), so the pair reads like a bent "く" mark rather
+  // than a single flourish. Same fill/outline/taper style on both. Sharp
   // mitered corners throughout (no rounded caps, no pointed tip) — round
   // line caps on an earlier thick-stroke version extended past the
   // declared viewBox and got silently clipped by the SVG's own default
   // overflow:hidden, which this avoids by keeping every vertex safely
   // inside the box with a margin. Left leans "\", right leans "/" (a
-  // mirror of the left shape), framing the text.
+  // mirror of the left pair), framing the text.
   function buildAccentLine(fillColor, strokeColor, side) {
-    const w = 30;
-    const leftPoints = [
-      [1, 9],
-      [13, 3],
-      [27, 37],
-      [23, 39],
+    const w = 48;
+    const primaryLeft = [
+      [20, 10],
+      [32, 4],
+      [46, 38],
+      [42, 40],
     ];
-    const points =
-      side === "left" ? leftPoints : leftPoints.map(([x, y]) => [w - x, y]);
-    const pointsAttr = points.map(([x, y]) => `${x},${y}`).join(" ");
-    const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="44" viewBox="0 0 ${w} 44">` +
-      `<polygon points="${pointsAttr}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" stroke-linejoin="miter"/>` +
-      `</svg>`;
+    const outerLeft = [
+      [1, 7],
+      [7, 1],
+      [16, 14],
+      [14, 16],
+    ];
+    const mirror = (pts) => pts.map(([x, y]) => [w - x, y]);
+    const primary = side === "left" ? primaryLeft : mirror(primaryLeft);
+    const outer = side === "left" ? outerLeft : mirror(outerLeft);
+    const toAttr = (pts) => pts.map(([x, y]) => `${x},${y}`).join(" ");
+    const polygon = (pts) =>
+      `<polygon points="${toAttr(pts)}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" stroke-linejoin="miter"/>`;
+    const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="44" viewBox="0 0 ${w} 44">${polygon(outer)}${polygon(primary)}</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
     return `<img class="album-names-accent" src="${dataUri}" width="${w}" height="44" alt="" />`;
   }

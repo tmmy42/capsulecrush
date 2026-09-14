@@ -753,10 +753,10 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 /* Tapered diagonal accent blade flanking each side of the names, filled
    + thin-outlined to match the name text's own colors. */
 .album-names-accent {
-  width: 26px;
+  width: 36px;
   height: 34px;
   vertical-align: -4px;
-  margin: 0 2px;
+  margin: 0 0;
 }
 .album-tagline {
   font-family: var(--font-heading);
