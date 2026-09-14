@@ -750,6 +750,14 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   font-weight: 700;
   margin: 0 16px;
 }
+/* Diagonal accent marks flanking the names, colored to match their fill/
+   stroke — sized against the 3.4rem name text next to them. */
+.album-names-accent {
+  width: 22px;
+  height: 28px;
+  vertical-align: -4px;
+  margin: 0 6px;
+}
 .album-tagline {
   font-family: var(--font-heading);
   font-style: italic;
@@ -763,9 +771,9 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
    tagline's own text height (a bit taller than wide, since it includes
    the two trailing circles beneath the cloud). */
 .album-tagline-icon {
-  width: 22px;
-  height: 26px;
-  vertical-align: -8px;
+  width: 30px;
+  height: 32px;
+  vertical-align: -10px;
   margin-left: 2px;
 }
 .album-grid {

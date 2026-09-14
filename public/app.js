@@ -681,16 +681,39 @@
   // actual <img> elements (data URIs included) reliably via plain
   // drawImage.
   function buildTaglineIcon() {
+    // Simpler 4-lobe cloud (fewer bumps than the first attempt) sized up,
+    // with two trailing circles running diagonally down-left from it —
+    // bigger near the cloud, smaller further away.
     const svgMarkup =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="30" viewBox="0 0 26 30">` +
-      `<path d="M8,15 C4,15 3,11 6.2,9.6 C5.3,6.2 9,3.6 12,5.6 C13.2,2.6 19,2.1 21,5.1 ` +
-      `C24.2,4.2 26.2,7.2 24,10 C26.2,11.2 25,15.2 21,15.2 C21,16.8 18,17.8 15,16.8 ` +
-      `C12,18.4 8,17.8 8,15 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.6" stroke-linejoin="round"/>` +
-      `<circle cx="8.5" cy="21" r="2.6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.6"/>` +
-      `<circle cx="5" cy="26.5" r="1.5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.6"/>` +
+      `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42">` +
+      `<path d="M10,20 C4,20 4,13 10,11 C9,4 19,1 24,6 C31,3 36,9 32,13 ` +
+      `C37,14 36,20 30,20 C30,24 22,25 18,23 C13,25 10,23 10,20 Z" ` +
+      `fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2" stroke-linejoin="round"/>` +
+      `<circle cx="8" cy="31" r="4.5" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>` +
+      `<circle cx="3" cy="38" r="2.6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>` +
       `</svg>`;
     const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
-    return `<img class="album-tagline-icon" src="${dataUri}" width="26" height="30" alt="" />`;
+    return `<img class="album-tagline-icon" src="${dataUri}" width="40" height="42" alt="" />`;
+  }
+
+  // Diagonal accent "speed line" flanking each side of the from/to names —
+  // colored to match the names' own fill/stroke. Drawn as two overlapping
+  // <line> strokes (a wide one in the stroke color, a narrower one in the
+  // fill color on top) rather than a filled+outlined shape, which is a
+  // simpler way to get the same "filled bar with an outline ring" look
+  // for a thin diagonal mark.
+  function buildAccentLine(fillColor, strokeColor, side) {
+    const coords =
+      side === "left" ? { x1: 4, y1: 26, x2: 20, y2: 4 } : { x1: 20, y1: 26, x2: 4, y2: 4 };
+    const svgMarkup =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="30" viewBox="0 0 24 30">` +
+      `<line x1="${coords.x1}" y1="${coords.y1}" x2="${coords.x2}" y2="${coords.y2}" ` +
+      `stroke="${strokeColor}" stroke-width="7" stroke-linecap="round"/>` +
+      `<line x1="${coords.x1}" y1="${coords.y1}" x2="${coords.x2}" y2="${coords.y2}" ` +
+      `stroke="${fillColor}" stroke-width="4" stroke-linecap="round"/>` +
+      `</svg>`;
+    const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
+    return `<img class="album-names-accent" src="${dataUri}" width="24" height="30" alt="" />`;
   }
 
   // Faux text-stroke via eight stacked, unblurred text-shadows — far more
@@ -740,9 +763,11 @@
     return `
       <div class="album-header">
         <div class="album-names" style="${nameColorStyle}">
+          ${buildAccentLine(theme.nameFill, theme.nameStroke, "left")}
           <span style="${nameFontStyle(fromName)}">${escapeHtml(fromName)}</span>
           <span class="album-names-to">to</span>
           <span style="${nameFontStyle(toName)}">${escapeHtml(toName)}</span>
+          ${buildAccentLine(theme.nameFill, theme.nameStroke, "right")}
         </div>
         <div class="album-tagline">Things I love about you&hellip; ${buildTaglineIcon()}</div>
       </div>
