@@ -27,8 +27,11 @@
       starsUrl: "bg-stars.svg",
       previewColors: ["#CBF3DC", "#FFD9EA"],
       dotColors: ["#FF1F8F", "#8B3DFF", "#00C4FF"],
-      nameFill: "#FF1F8F",
-      nameStroke: "#8B3DFF",
+      // Pink-on-pink (against the FFD9EA checker square) read poorly —
+      // swapped from the usual pink-fill/purple-stroke pairing so the
+      // fill is a hue that isn't already in this theme's own background.
+      nameFill: "#8B3DFF",
+      nameStroke: "#FF1F8F",
       cloudFill: "#00C4FF",
     },
     "lavender-yellow": {
@@ -701,20 +704,21 @@
 
   // Diagonal accent "blade" flanking each side of the from/to names, like
   // "\\ Name /" — a single tapered polygon per side (wide flat top edge,
-  // coming to a sharp point at the bottom) rather than a uniform-width
-  // stroke, with a thin outline for definition. Sharp mitered corners
-  // throughout (no rounded caps) — round line caps on the earlier
-  // thick-stroke version extended past the declared viewBox and got
-  // silently clipped by the SVG's own default overflow:hidden, which
-  // this avoids by keeping every vertex safely inside the box with a
-  // 2-4px margin. Left leans "\", right leans "/" (a mirror of the left
-  // shape), framing the text.
+  // narrower flat bottom edge — a trapezoid, not a point) rather than a
+  // uniform-width stroke, with a thin outline for definition. Sharp
+  // mitered corners throughout (no rounded caps, no pointed tip) — round
+  // line caps on an earlier thick-stroke version extended past the
+  // declared viewBox and got silently clipped by the SVG's own default
+  // overflow:hidden, which this avoids by keeping every vertex safely
+  // inside the box with a margin. Left leans "\", right leans "/" (a
+  // mirror of the left shape), framing the text.
   function buildAccentLine(fillColor, strokeColor, side) {
-    const w = 34;
+    const w = 30;
     const leftPoints = [
-      [3, 11],
-      [15, 5],
-      [27, 40],
+      [1, 9],
+      [13, 3],
+      [27, 37],
+      [23, 39],
     ];
     const points =
       side === "left" ? leftPoints : leftPoints.map(([x, y]) => [w - x, y]);

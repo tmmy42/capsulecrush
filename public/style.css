@@ -773,7 +773,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .album-tagline-icon {
   width: 34px;
   height: 34px;
-  vertical-align: -20px;
+  vertical-align: -12px;
   margin-left: 2px;
 }
 .album-grid {
