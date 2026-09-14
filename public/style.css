@@ -444,6 +444,25 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   z-index: 1;
   overflow: visible;
 }
+
+/* Halftone cloud motif: sits diagonally above-left of the machine, partly
+   tucked behind it, drifting gently to feel alive without competing with
+   the dial/lever animation */
+.machine-cloud-deco {
+  position: absolute;
+  top: -46px;
+  left: -46px;
+  width: 128px;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .92;
+  animation: cloud-drift 7s ease-in-out infinite;
+}
+@keyframes cloud-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-2px, 4px); }
+}
 .machine-shadow { fill: #1A1A1A; opacity: .16; }
 .machine-outline-stroke { fill: none; stroke: #1A1A1A; stroke-width: 2.6; stroke-linejoin: round; }
 

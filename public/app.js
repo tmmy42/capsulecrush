@@ -207,6 +207,7 @@
   function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
   btnGasha.addEventListener("click", runGasha);
+  lever.addEventListener("click", runGasha);
 
   function showResult(capsule) {
     $("#result-text").textContent = capsule.text;
