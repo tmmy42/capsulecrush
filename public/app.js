@@ -27,6 +27,9 @@
       starsUrl: "bg-stars.svg",
       previewColors: ["#CBF3DC", "#FFD9EA"],
       dotColors: ["#FF1F8F", "#8B3DFF", "#00C4FF"],
+      nameFill: "#FF1F8F",
+      nameStroke: "#8B3DFF",
+      cloudFill: "#00C4FF",
     },
     "lavender-yellow": {
       label: "Lavender & Yellow",
@@ -34,6 +37,9 @@
       starsUrl: "bg-stars-lavender-yellow.svg",
       previewColors: ["#E4DBFF", "#FFF1B8"],
       dotColors: ["#FFC400", "#8B3DFF", "#FF8FD8"],
+      nameFill: "#FFC400",
+      nameStroke: "#8B3DFF",
+      cloudFill: "#FF8FD8",
     },
     "sky-coral": {
       label: "Sky & Coral",
@@ -41,6 +47,9 @@
       starsUrl: "bg-stars-sky-coral.svg",
       previewColors: ["#CFEFFF", "#FFD6C9"],
       dotColors: ["#FF6B4A", "#00A3FF", "#FF5FA0"],
+      nameFill: "#FF6B4A",
+      nameStroke: "#00A3FF",
+      cloudFill: "#FF5FA0",
     },
     "grape-peach": {
       label: "Grape & Peach",
@@ -48,6 +57,9 @@
       starsUrl: "bg-stars-grape-peach.svg",
       previewColors: ["#EAD8FF", "#FFE3CC"],
       dotColors: ["#FF8A4C", "#8B3DFF", "#FF5FA0"],
+      nameFill: "#FF8A4C",
+      nameStroke: "#8B3DFF",
+      cloudFill: "#FF5FA0",
     },
   };
   const DEFAULT_THEME = "mint-pink";
@@ -659,7 +671,36 @@
   let albumBlob = null;
   let albumSetupTheme = DEFAULT_THEME;
 
-  function buildAlbumMarkup(capsules, fromName, toName) {
+  // A self-contained inline <svg> (no <use>/external symbol refs — those
+  // don't reliably rasterize through html2canvas — confirmed by testing,
+  // an inline <svg> renders fine in-browser but comes out blank in the
+  // captured canvas) for the bumpy "mokumoku" cloud/speech-bubble
+  // decoration under the album tagline. Encoded as a base64 data-URI <img>
+  // instead: html2canvas draws actual <img> elements (svg data URIs
+  // included) via plain drawImage, which it handles reliably, unlike a
+  // raw inline <svg> subtree. Same silhouette style as the earlier
+  // home-screen cloud decoration, recolored per theme.
+  function buildCloudBubbleSvg(fillColor) {
+    const svgMarkup =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="128" viewBox="0 0 240 140">` +
+      `<path d="M40,90 C15,90 10,60 30,55 C25,30 60,20 75,38 C85,15 130,12 145,35 ` +
+      `C165,15 205,25 200,55 C225,58 225,90 200,95 C205,115 165,120 145,105 ` +
+      `C125,122 85,122 70,105 C45,115 30,105 40,90 Z" ` +
+      `fill="${fillColor}" stroke="#1A1A1A" stroke-width="5" stroke-linejoin="round"/></svg>`;
+    const dataUri = `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
+    return `<img class="album-cloud-bubble" src="${dataUri}" width="220" height="128" alt="" />`;
+  }
+
+  // Faux text-stroke via eight stacked, unblurred text-shadows — far more
+  // reliably rasterized by html2canvas than -webkit-text-stroke, which it
+  // doesn't consistently render.
+  function textOutlineStyle(strokeColor) {
+    const offsets = ["-2px -2px", "2px -2px", "-2px 2px", "2px 2px", "0 -2px", "0 2px", "-2px 0", "2px 0"];
+    const shadow = offsets.map((o) => `${o} 0 ${strokeColor}`).join(", ");
+    return `text-shadow: ${shadow};`;
+  }
+
+  function buildAlbumMarkup(capsules, fromName, toName, theme) {
     const bgClasses = ["", "album-card-b", "album-card-c"];
     const cards = capsules
       .map((c, i) => {
@@ -681,10 +722,12 @@
 
     // No wordmark here on purpose — the gift is the from/to pairing and
     // the collected memories, not a branded template.
+    const nameStyle = `color:${theme.nameFill}; ${textOutlineStyle(theme.nameStroke)}`;
     return `
       <div class="album-header">
-        <div class="album-names">${escapeHtml(fromName)} <span class="album-names-to">to</span> ${escapeHtml(toName)}</div>
+        <div class="album-names" style="${nameStyle}">${escapeHtml(fromName)} <span class="album-names-to">to</span> ${escapeHtml(toName)}</div>
         <div class="album-tagline">Things I love about you&hellip;</div>
+        ${buildCloudBubbleSvg(theme.cloudFill)}
       </div>
       <div class="album-grid">${cards}</div>
     `;
@@ -716,7 +759,7 @@
     try {
       const theme = BACKGROUND_THEMES[themeId] || BACKGROUND_THEMES[DEFAULT_THEME];
       container.style.backgroundImage = `url('${theme.checkerUrl}')`;
-      container.innerHTML = buildAlbumMarkup(state.capsules, fromName || "me", toName || "you");
+      container.innerHTML = buildAlbumMarkup(state.capsules, fromName || "me", toName || "you", theme);
 
       const imgs = Array.from(container.querySelectorAll("img"));
       await Promise.all(
@@ -774,11 +817,10 @@
   $("#album-share").addEventListener("click", async () => {
     if (!albumBlob) return;
     const file = new File([albumBlob], "capsulecrush-album.png", { type: "image/png" });
-    const shareData = {
-      files: [file],
-      title: "CapsuleCrush Album",
-      text: `Favorite things about ${state.partnerName || "them"}`,
-    };
+    const shareData = { files: [file], title: "Things I love about you" };
+    // Web platforms have no API to write straight into the camera roll —
+    // routing through the native share sheet (which offers "Save Image"/
+    // "Save to Photos" on iOS and Android) is the closest equivalent.
     if (navigator.canShare && navigator.canShare(shareData)) {
       try {
         await navigator.share(shareData);

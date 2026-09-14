@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,800&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
 
 /* =========================================================================
    DESIGN TOKENS
@@ -708,6 +708,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   background: #fff;
 }
 .album-preview-wrap img { width: 100%; display: block; }
+.album-download-fallback { margin-top: var(--space-3); }
 
 /* Off-screen collage source that html2canvas photographs. Fixed pixel
    width (not responsive) so the exported image has a consistent, readable
@@ -729,20 +730,21 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 /* Recipient-first header: no wordmark — the two names being connected
    are the whole point of a gift like this, so they carry the visual
    weight a logo used to. */
-.album-header { text-align: center; margin-bottom: 44px; }
+.album-header { text-align: center; margin-bottom: 24px; }
+/* Fill/stroke colors are set inline per-generation (they follow the
+   chosen album theme — see textOutlineStyle() in app.js); font size and
+   weight live here since those don't vary. */
 .album-names {
   font-family: var(--font-heading);
   font-style: italic;
-  font-weight: 600;
-  font-size: 2.5rem;
-  color: var(--color-primary);
-  line-height: 1.25;
+  font-weight: 800;
+  font-size: 3.4rem;
+  line-height: 1.2;
 }
 .album-names-to {
-  color: var(--color-ink);
-  font-size: 1.5rem;
-  font-weight: 500;
-  margin: 0 14px;
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0 16px;
 }
 .album-tagline {
   font-family: var(--font-heading);
@@ -751,6 +753,16 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   font-size: 1.4rem;
   color: var(--color-ink-soft);
   margin-top: 10px;
+}
+/* Bumpy "mokumoku" cloud/speech-bubble decoration beneath the tagline —
+   sticker-style (bold black outline, flat theme-colored fill), matching
+   the app's illustration language elsewhere. */
+.album-cloud-bubble {
+  width: 200px;
+  height: auto;
+  margin: 8px auto 0;
+  display: block;
+  filter: drop-shadow(0 4px 0 rgba(26,26,26,.12));
 }
 .album-grid {
   display: grid;
