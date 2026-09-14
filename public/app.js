@@ -1,12 +1,81 @@
 (() => {
+  // Real-device fallback for the "100vh doesn't cover the status bar / is
+  // wrong while the mobile toolbar animates" class of bugs: mirror the true
+  // visible screen height into a CSS custom property so the fixed
+  // background layers (see .bg-checker-layer etc. in style.css) can use it
+  // as a last-resort height even on engines where dvh alone isn't enough.
+  function syncViewportHeight() {
+    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty("--app-vh", `${h}px`);
+  }
+  syncViewportHeight();
+  window.addEventListener("resize", syncViewportHeight);
+  window.addEventListener("orientationchange", syncViewportHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncViewportHeight);
+  }
+
+  // ---------- background themes ----------
+  // Same checker pattern + star style everywhere — only the two checker
+  // colors and the six star colors change between themes (see
+  // scratchpad/gen_themes.py: each variant asset is a straight hex-code
+  // swap of the original bg-checker.svg / bg-stars.svg, nothing redrawn).
+  const BACKGROUND_THEMES = {
+    "mint-pink": {
+      label: "Mint & Pink",
+      checkerUrl: "bg-checker.svg",
+      starsUrl: "bg-stars.svg",
+      previewColors: ["#CBF3DC", "#FFD9EA"],
+      dotColors: ["#FF1F8F", "#8B3DFF", "#00C4FF"],
+    },
+    "lavender-yellow": {
+      label: "Lavender & Yellow",
+      checkerUrl: "bg-checker-lavender-yellow.svg",
+      starsUrl: "bg-stars-lavender-yellow.svg",
+      previewColors: ["#E4DBFF", "#FFF1B8"],
+      dotColors: ["#FFC400", "#8B3DFF", "#FF8FD8"],
+    },
+    "sky-coral": {
+      label: "Sky & Coral",
+      checkerUrl: "bg-checker-sky-coral.svg",
+      starsUrl: "bg-stars-sky-coral.svg",
+      previewColors: ["#CFEFFF", "#FFD6C9"],
+      dotColors: ["#FF6B4A", "#00A3FF", "#FF5FA0"],
+    },
+    "grape-peach": {
+      label: "Grape & Peach",
+      checkerUrl: "bg-checker-grape-peach.svg",
+      starsUrl: "bg-stars-grape-peach.svg",
+      previewColors: ["#EAD8FF", "#FFE3CC"],
+      dotColors: ["#FF8A4C", "#8B3DFF", "#FF5FA0"],
+    },
+  };
+  const DEFAULT_THEME = "mint-pink";
+
+  function applyBackgroundTheme(themeId) {
+    const theme = BACKGROUND_THEMES[themeId] ? themeId : DEFAULT_THEME;
+    const cfg = BACKGROUND_THEMES[theme];
+    // Uses document.querySelector directly rather than the $ shorthand,
+    // since this runs before $ is declared (called immediately on load
+    // so a returning user's theme applies with no flash of the default).
+    document.querySelector(".bg-checker-layer").style.backgroundImage = `url('${cfg.checkerUrl}')`;
+    document.querySelector(".stars-overlay").style.backgroundImage = `url('${cfg.starsUrl}')`;
+    state.backgroundTheme = theme;
+    localStorage.setItem("cc_bg_theme", theme);
+  }
+
   const state = {
     token: localStorage.getItem("cc_token") || null,
     username: localStorage.getItem("cc_username") || null,
     partnerName: localStorage.getItem("cc_partner_name") || null,
+    backgroundTheme: localStorage.getItem("cc_bg_theme") || DEFAULT_THEME,
     capsules: [],
     editingId: null,
     isGashaRunning: false,
   };
+  // Apply immediately (even before any login check) so a returning user's
+  // chosen background shows with no flash of the default theme.
+  applyBackgroundTheme(state.backgroundTheme);
 
   const $ = (sel) => document.querySelector(sel);
   const screens = {
@@ -14,6 +83,7 @@
     home: $("#screen-home"),
     post: $("#screen-post"),
     list: $("#screen-list"),
+    settings: $("#screen-settings"),
   };
   const bottomNav = $("#bottom-nav");
 
@@ -43,15 +113,17 @@
     if (name === "home") refreshHome();
     if (name === "list") refreshList();
     if (name === "post" && !state.editingId) resetPostForm();
+    if (name === "settings") renderThemeGrid();
     requestAnimationFrame(updateScrollHint);
   }
 
   // ---------- auth ----------
 
-  function setLoggedIn(token, username, partnerName) {
+  function setLoggedIn(token, username, partnerName, backgroundTheme) {
     state.token = token;
     state.username = username;
     state.partnerName = partnerName;
+    applyBackgroundTheme(backgroundTheme || DEFAULT_THEME);
     localStorage.setItem("cc_token", token);
     localStorage.setItem("cc_username", username);
     localStorage.setItem("cc_partner_name", partnerName);
@@ -92,7 +164,7 @@
         method: "POST",
         body: JSON.stringify({ username, partner_name }),
       });
-      setLoggedIn(data.token, data.username, data.partner_name);
+      setLoggedIn(data.token, data.username, data.partner_name, data.background_theme);
     } catch (err) {
       errorEl.textContent = err.message;
     }
@@ -109,7 +181,7 @@
         method: "POST",
         body: JSON.stringify({ username, partner_name }),
       });
-      setLoggedIn(data.token, data.username, data.partner_name);
+      setLoggedIn(data.token, data.username, data.partner_name, data.background_theme);
     } catch (err) {
       errorEl.textContent = err.message;
     }
@@ -159,6 +231,8 @@
     localStorage.removeItem("cc_token");
     localStorage.removeItem("cc_username");
     localStorage.removeItem("cc_partner_name");
+    localStorage.removeItem("cc_bg_theme");
+    applyBackgroundTheme(DEFAULT_THEME);
     showScreen("auth");
   });
 
@@ -170,6 +244,50 @@
       showScreen(el.dataset.nav);
     });
   });
+
+  $("#btn-settings").addEventListener("click", () => showScreen("settings"));
+  $("#btn-settings-back").addEventListener("click", () => showScreen("home"));
+
+  // ---------- settings / background theme ----------
+
+  function renderThemeGrid() {
+    const grid = $("#theme-grid");
+    grid.innerHTML = "";
+    Object.entries(BACKGROUND_THEMES).forEach(([id, cfg]) => {
+      const swatch = document.createElement("button");
+      swatch.type = "button";
+      swatch.className = "theme-swatch" + (id === state.backgroundTheme ? " active" : "");
+      const gradient = `linear-gradient(135deg, ${cfg.previewColors[0]} 50%, ${cfg.previewColors[1]} 50%)`;
+      swatch.innerHTML = `
+        <div class="theme-swatch-preview" style="background:${gradient}">
+          <div class="theme-swatch-dots">
+            ${cfg.dotColors.map((c) => `<span style="background:${c}"></span>`).join("")}
+          </div>
+          <span class="theme-swatch-check"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span>
+        </div>
+        <span>${escapeHtml(cfg.label)}</span>
+      `;
+      swatch.addEventListener("click", () => selectBackgroundTheme(id));
+      grid.appendChild(swatch);
+    });
+  }
+
+  async function selectBackgroundTheme(themeId) {
+    if (themeId === state.backgroundTheme) return;
+    const previous = state.backgroundTheme;
+    applyBackgroundTheme(themeId);
+    renderThemeGrid();
+    try {
+      await api("/api/auth/theme", {
+        method: "PUT",
+        body: JSON.stringify({ background_theme: themeId }),
+      });
+    } catch (err) {
+      applyBackgroundTheme(previous);
+      renderThemeGrid();
+      alert("Couldn't save that background: " + err.message);
+    }
+  }
 
   // ---------- home / gasha ----------
 
@@ -607,20 +725,21 @@
       showScreen("auth");
       return;
     }
-    if (!state.partnerName) {
-      try {
-        const me = await api("/api/auth/me");
-        state.partnerName = me.partner_name;
-        localStorage.setItem("cc_partner_name", me.partner_name);
-      } catch (_) {
-        // session invalid/expired — send back to auth
-        state.token = null;
-        localStorage.removeItem("cc_token");
-        localStorage.removeItem("cc_username");
-        localStorage.removeItem("cc_partner_name");
-        showScreen("auth");
-        return;
-      }
+    try {
+      // Always sync from the server (not just when partnerName is missing)
+      // so a background theme chosen on another device also applies here.
+      const me = await api("/api/auth/me");
+      state.partnerName = me.partner_name;
+      localStorage.setItem("cc_partner_name", me.partner_name);
+      applyBackgroundTheme(me.background_theme);
+    } catch (_) {
+      // session invalid/expired — send back to auth
+      state.token = null;
+      localStorage.removeItem("cc_token");
+      localStorage.removeItem("cc_username");
+      localStorage.removeItem("cc_partner_name");
+      showScreen("auth");
+      return;
     }
     applyPersonalization();
     showScreen("home");

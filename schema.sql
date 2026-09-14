@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE NOT NULL,
   partner_name TEXT NOT NULL,
   passcode_hash TEXT NOT NULL,
+  background_theme TEXT NOT NULL DEFAULT 'mint-pink',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

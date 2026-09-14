@@ -41,6 +41,9 @@
     <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
     <symbol id="icon-package-open" viewBox="0 0 24 24"><path d="M12 22v-9"/><path d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z"/><path d="M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13"/><path d="M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z"/></symbol>
     <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   </defs>
 </svg>
 
@@ -92,9 +95,14 @@
     <header class="home-header">
       <img src="logo.png" alt="CapsuleCrush" class="logo-image logo-image-home" />
       <p class="home-subtitle" id="home-subtitle"></p>
-      <button id="btn-logout" class="icon-btn logout-floating" title="Log out" aria-label="Log out">
-        <svg class="icon" aria-hidden="true"><use href="#icon-logout"/></svg>
-      </button>
+      <div class="home-header-actions">
+        <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings">
+          <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg>
+        </button>
+        <button id="btn-logout" class="icon-btn" title="Log out" aria-label="Log out">
+          <svg class="icon" aria-hidden="true"><use href="#icon-logout"/></svg>
+        </button>
+      </div>
     </header>
 
     <div class="gasha-stage">
@@ -313,6 +321,21 @@
       Create Album
     </button>
     <div id="list-grid" class="list-grid"></div>
+  </section>
+
+  <!-- ===== SETTINGS SCREEN ===== -->
+  <section id="screen-settings" class="screen screen-settings hidden">
+    <header class="topbar">
+      <button id="btn-settings-back" class="icon-btn" title="Back" aria-label="Back">
+        <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"/></svg>
+      </button>
+      <h1 class="screen-title">Settings</h1>
+      <span class="topbar-spacer" aria-hidden="true"></span>
+    </header>
+
+    <p class="settings-section-label">Background</p>
+    <p class="settings-section-hint">Same patterns, your pick of colors.</p>
+    <div id="theme-grid" class="theme-grid"></div>
   </section>
 
   <!-- Album modal: preview of the generated collage, with download/share -->

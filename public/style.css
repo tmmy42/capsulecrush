@@ -66,7 +66,15 @@
 
 * { box-sizing: border-box; }
 
-html, body {
+html {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+body {
   margin: 0;
   padding: 0;
   background: var(--color-bg);
@@ -76,6 +84,12 @@ html, body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
+  /* NOTE: overflow-x:hidden is intentionally kept off <html> — some iOS
+     Safari versions shrink position:fixed children to exclude the safe
+     area (status bar/notch) once the root element itself has overflow
+     set, even though the fixed element's own inset:0/height should
+     otherwise span the full device screen. Scoping it to body only
+     avoids that interaction while still preventing horizontal scroll. */
 }
 
 /* Warped checkerboard ground: a sine-perturbed grid in two brand colors,
@@ -86,12 +100,27 @@ html, body {
    background-attachment:fixed — mobile Safari has a long-standing bug
    where a fixed-attachment body background fails to repaint correctly as
    the dynamic address-bar/safe-area resizes, leaving the very top (behind
-   the status bar/notch) unpainted. inset:0 on a fixed element always
-   tracks the true visual viewport, notch included, with no such gap. */
-.bg-checker-layer {
+   the status bar/notch) unpainted.
+   Belt-and-braces sizing: inset:0 alone should already span the full
+   device screen (notch included) once <meta viewport-fit=cover> is set,
+   but real-device iOS Safari has had bugs where that isn't reliably true
+   as the dynamic toolbar animates. So this also sets an explicit height
+   — 100dvh where supported, and as a last-resort fallback, a JS-computed
+   --app-vh custom property (see app.js syncViewportHeight, driven off
+   window.visualViewport/innerHeight) for engines that get either wrong. */
+.bg-checker-layer,
+.stars-overlay,
+.grain-overlay {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100dvh;
+  height: var(--app-vh, 100dvh);
+}
+
+.bg-checker-layer {
   pointer-events: none;
+  background-color: var(--color-bg);
   background-image: url('bg-checker.svg');
   background-repeat: no-repeat;
   background-size: cover;
@@ -107,8 +136,6 @@ html, body {
    plain DOM order decides paint order instead: this div comes before
    #app in the HTML, so #app (and everything in it) paints on top. */
 .stars-overlay {
-  position: fixed;
-  inset: 0;
   pointer-events: none;
   background-image: url('bg-stars.svg');
   background-repeat: no-repeat;
@@ -118,8 +145,6 @@ html, body {
 
 /* Vintage film-grain overlay: fixed above everything, ignores input */
 .grain-overlay {
-  position: fixed;
-  inset: 0;
   z-index: 100;
   pointer-events: none;
   background-image: url('grain.svg');
@@ -290,7 +315,8 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
   align-items: center;
   padding: var(--space-1) 0 var(--space-3);
 }
-.logout-floating { position: absolute; top: 0; right: 0; }
+.home-header-actions { position: absolute; top: 0; right: 0; display: flex; gap: var(--space-2); }
+.topbar-spacer { display: inline-block; width: 44px; height: 44px; flex-shrink: 0; }
 
 /* ===== Auth ===== */
 .screen-auth { justify-content: center; align-items: center; padding: var(--space-6); position: relative; }
@@ -749,6 +775,77 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   font-size: 1.1rem;
   color: var(--color-ink-soft);
 }
+
+/* ===== Settings ===== */
+.settings-section-label { font-weight: 700; font-size: 1rem; margin: 0 0 2px; }
+.settings-section-hint { color: var(--color-ink-soft); font-size: .85rem; margin: 0 0 var(--space-4); }
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+.theme-swatch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--line-reg) solid var(--color-ink);
+  border-radius: var(--shape-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  box-shadow: var(--elev-1);
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 500;
+  font-size: .9rem;
+  color: var(--color-ink);
+}
+.theme-swatch-preview {
+  width: 100%;
+  height: 64px;
+  border-radius: var(--shape-sm);
+  border: var(--line-thin) solid var(--color-ink);
+  position: relative;
+  overflow: hidden;
+}
+.theme-swatch-dots {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.theme-swatch-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-ink);
+  box-shadow: 0 1px 2px rgba(26,26,26,.2);
+}
+.theme-swatch.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255,95,160,.25), var(--elev-1);
+}
+.theme-swatch-check {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: var(--line-thin) solid var(--color-ink);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.theme-swatch-check .icon { width: 14px; height: 14px; stroke-width: 3; }
+.theme-swatch.active .theme-swatch-check { display: flex; }
 
 /* ===== Bottom nav ===== */
 .bottom-nav {

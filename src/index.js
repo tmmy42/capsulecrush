@@ -21,6 +21,11 @@ function isValidPartnerName(partnerName) {
   return typeof partnerName === "string" && partnerName.trim().length >= 1 && partnerName.trim().length <= 64;
 }
 
+const BACKGROUND_THEMES = ["mint-pink", "lavender-yellow", "sky-coral", "grape-peach"];
+function isValidBackgroundTheme(theme) {
+  return BACKGROUND_THEMES.includes(theme);
+}
+
 async function requireAuth(c, next) {
   const auth = c.req.header("authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
@@ -71,7 +76,7 @@ app.post("/api/auth/signup", async (c) => {
     .bind(token, userId)
     .run();
 
-  return c.json({ token, username, partner_name: partnerName });
+  return c.json({ token, username, partner_name: partnerName, background_theme: "mint-pink" });
 });
 
 app.post("/api/auth/login", async (c) => {
@@ -83,7 +88,7 @@ app.post("/api/auth/login", async (c) => {
   }
 
   const user = await c.env.DB.prepare(
-    `SELECT id, partner_name, passcode_hash FROM users WHERE username = ?`
+    `SELECT id, partner_name, passcode_hash, background_theme FROM users WHERE username = ?`
   )
     .bind(username)
     .first();
@@ -101,16 +106,32 @@ app.post("/api/auth/login", async (c) => {
     .bind(token, user.id)
     .run();
 
-  return c.json({ token, username, partner_name: user.partner_name });
+  return c.json({ token, username, partner_name: user.partner_name, background_theme: user.background_theme });
 });
 
 app.get("/api/auth/me", requireAuth, async (c) => {
   const userId = c.get("userId");
-  const user = await c.env.DB.prepare(`SELECT username, partner_name FROM users WHERE id = ?`)
+  const user = await c.env.DB.prepare(`SELECT username, partner_name, background_theme FROM users WHERE id = ?`)
     .bind(userId)
     .first();
   if (!user) return c.json({ error: "User not found" }, 404);
-  return c.json({ username: user.username, partner_name: user.partner_name });
+  return c.json({ username: user.username, partner_name: user.partner_name, background_theme: user.background_theme });
+});
+
+app.put("/api/auth/theme", requireAuth, async (c) => {
+  const userId = c.get("userId");
+  const body = await c.req.json().catch(() => ({}));
+  const { background_theme } = body;
+
+  if (!isValidBackgroundTheme(background_theme)) {
+    return c.json({ error: "Unknown background theme" }, 400);
+  }
+
+  await c.env.DB.prepare(`UPDATE users SET background_theme = ? WHERE id = ?`)
+    .bind(background_theme, userId)
+    .run();
+
+  return c.json({ background_theme });
 });
 
 app.post("/api/auth/logout", requireAuth, async (c) => {
