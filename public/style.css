@@ -153,26 +153,6 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
   vertical-align: -4px;
 }
 
-/* Decorative motifs — exactly two shapes (sparkle + dot), styled with the
-   same hairline stroke weight and soft shadow as the machine illustration
-   so they read as part of one scene rather than scattered clip-art. */
-.deco, .auth-deco {
-  position: absolute;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 3px rgba(26,26,26,.16));
-}
-.deco-star {
-  fill: var(--color-support);
-  stroke: var(--color-ink);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-.deco-dot {
-  fill: var(--color-secondary);
-  stroke: var(--color-ink);
-  stroke-width: 1.5;
-}
-
 /* ===== Wordmark: supplied image asset only — never recreated in type --- */
 .logo-image { display: block; height: auto; }
 .logo-image-auth { width: 200px; margin: 0 auto var(--space-2); }
@@ -198,6 +178,14 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
   margin: 0 0 var(--space-5);
   font-weight: 500;
   color: var(--color-ink-soft);
+}
+
+/* "<name>? — Start the collection" reliably wraps at odd points on narrow
+   phone widths (mid-word, or right after the em dash); force a clean break
+   right before the dash instead so it reads as two balanced lines. */
+.collection-break { display: none; }
+@media (max-width: 480px) {
+  .collection-break { display: block; }
 }
 
 /* Screen titles use the elegant italic serif, not the wordmark */
@@ -294,12 +282,6 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
 
 /* ===== Auth ===== */
 .screen-auth { justify-content: center; align-items: center; padding: var(--space-6); position: relative; }
-/* Auth decorations cluster at two opposite corners, partly tucked behind
-   the card's rounded edge, rather than floating free in open space */
-.star-a1 { width: 26px; height: 26px; top: 12px; left: 12px; transform: rotate(-14deg); }
-.dot-a1 { width: 12px; height: 12px; top: 46px; left: 6px; }
-.star-a2 { width: 18px; height: 18px; bottom: 12px; right: 12px; transform: rotate(16deg); }
-.dot-a2 { width: 14px; height: 14px; bottom: 44px; right: 6px; fill: var(--color-primary); }
 
 .auth-card {
   background: var(--color-surface);
@@ -361,8 +343,16 @@ input[type="text"], input[type="password"], input[type="date"], textarea {
   outline: none;
   color: var(--color-ink);
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 48px;
 }
+/* Some mobile browsers give the native date control an intrinsic content
+   width that ignores width:100% on its own; min-width:0 on the field and
+   its flex ancestors lets it actually shrink to fit the screen instead of
+   pushing past the right edge. */
+.field, .post-form { min-width: 0; }
+input[type="date"] { min-width: 0; }
 textarea { min-height: unset; font-family: var(--font-ja); font-style: normal; font-size: .95rem; }
 input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(255,95,160,.22); }
 /* Custom file field: the native input is visually hidden (still fully
@@ -679,4 +669,71 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 
 @media (min-width: 481px) {
   #app { border-left: 1px solid rgba(26,26,26,.08); border-right: 1px solid rgba(26,26,26,.08); }
+}
+
+/* ===== Button press feedback ===== */
+/* Applied via JS (app.js toggles this class on pointerdown, delegated to
+   every button-like control) so it retriggers cleanly on repeat taps
+   instead of relying on :active, which can't restart a running animation. */
+@keyframes btn-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(.91); }
+  65% { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+.btn-pop {
+  animation: btn-pop 280ms cubic-bezier(.34, 1.56, .64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-pop { animation: none !important; }
+}
+
+/* ===== Scroll-down hint ===== */
+.scroll-hint {
+  position: fixed;
+  left: var(--space-4);
+  bottom: calc(88px + env(safe-area-inset-bottom) + var(--space-3));
+  z-index: 6;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: var(--line-reg) solid var(--color-ink);
+  border-radius: var(--shape-sm);
+  box-shadow: var(--elev-2);
+  pointer-events: none;
+  animation: scroll-hint-bob 1.4s ease-in-out infinite;
+}
+.scroll-hint .icon { stroke: var(--color-ink); }
+@keyframes scroll-hint-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint { animation: none !important; }
+}
+
+/* ===== Crop modal ===== */
+.crop-modal-card { text-align: left; }
+.crop-title { font-weight: 600; margin: 0 0 var(--space-3); text-align: center; }
+.crop-container {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  background: #000;
+  border-radius: var(--shape-sm);
+  overflow: hidden;
+  border: var(--line-thin) solid var(--color-ink);
+}
+.crop-container img { display: block; max-width: 100%; }
+.crop-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.crop-zoom-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--color-primary);
 }

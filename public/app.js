@@ -43,6 +43,7 @@
     if (name === "home") refreshHome();
     if (name === "list") refreshList();
     if (name === "post" && !state.editingId) resetPostForm();
+    requestAnimationFrame(updateScrollHint);
   }
 
   // ---------- auth ----------
@@ -75,8 +76,9 @@
     $("#post-text-label").innerHTML = `What do you love about ${n}?`;
     $("#list-title").innerHTML = `${n}'s Capsules`;
     const heart = `<svg class="icon icon-inline icon-heart" aria-hidden="true"><use href="#icon-heart"/></svg>`;
-    $("#empty-state-text").innerHTML = `What do you love about ${n}? — Start the collection ${heart}`;
-    $("#list-empty-text").innerHTML = `What do you love about ${n}? — Start the collection ${heart}`;
+    const collectionLine = `What do you love about ${n}?<br class="collection-break"> — Start the collection ${heart}`;
+    $("#empty-state-text").innerHTML = collectionLine;
+    $("#list-empty-text").innerHTML = collectionLine;
   }
 
   $("#form-login").addEventListener("submit", async (e) => {
@@ -112,6 +114,32 @@
       errorEl.textContent = err.message;
     }
   });
+
+  // ---------- button press feedback (pop/bounce on every button-like control) ----------
+
+  document.addEventListener("pointerdown", (e) => {
+    const btn = e.target.closest("button, .file-trigger");
+    if (!btn) return;
+    btn.classList.remove("btn-pop");
+    void btn.offsetWidth; // reflow so a repeated tap restarts the animation
+    btn.classList.add("btn-pop");
+  });
+  document.addEventListener("animationend", (e) => {
+    if (e.animationName === "btn-pop") e.target.classList.remove("btn-pop");
+  });
+
+  // ---------- scroll-down hint ----------
+
+  const scrollHint = $("#scroll-hint");
+  function updateScrollHint() {
+    const doc = document.documentElement;
+    const canScrollMore = doc.scrollHeight - window.innerHeight - window.scrollY > 24;
+    scrollHint.classList.toggle("hidden", !canScrollMore);
+  }
+  window.addEventListener("scroll", updateScrollHint, { passive: true });
+  window.addEventListener("resize", updateScrollHint);
+  document.addEventListener("load", updateScrollHint, true); // images loading can change page height
+  new MutationObserver(updateScrollHint).observe($("#app"), { childList: true, subtree: true, attributes: true });
 
   document.querySelectorAll(".auth-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -240,10 +268,12 @@
   // ---------- post ----------
 
   let pendingImageKey = null;
+  let pendingImageBlob = null; // cropped image ready to upload, overrides pendingImageKey
 
   function resetPostForm() {
     state.editingId = null;
     pendingImageKey = null;
+    pendingImageBlob = null;
     $("#post-title").innerHTML = `New Capsule for ${nameSpan(state.partnerName || "them")}`;
     $("#post-text").value = "";
     $("#post-date").value = "";
@@ -256,15 +286,84 @@
     $("#post-error").textContent = "";
   }
 
+  // ---------- photo crop ----------
+  // The crop frame's aspect ratio matches how photos actually render in the
+  // app (the list-view capsule card thumbnail: a fixed-height, object-fit:
+  // cover strip), so what the user crops is exactly what they'll see later.
+  const CROP_ASPECT_RATIO = 3 / 2;
+
+  const cropModal = $("#crop-modal");
+  const cropImage = $("#crop-image");
+  const cropZoom = $("#crop-zoom");
+  let cropper = null;
+
+  function openCropModal(dataUrl) {
+    cropImage.src = dataUrl;
+    cropModal.classList.remove("hidden");
+    if (cropper) cropper.destroy();
+    cropper = new Cropper(cropImage, {
+      aspectRatio: CROP_ASPECT_RATIO,
+      viewMode: 1,
+      dragMode: "move",
+      autoCropArea: 1,
+      background: false,
+      responsive: true,
+      zoomOnWheel: true,
+      ready() {
+        // Match the slider's starting position to cropper's own initial
+        // fit-to-frame zoom ratio so the first drag doesn't jump the image
+        const img = cropper.getImageData();
+        const ratio = img.width / img.naturalWidth;
+        cropZoom.min = (ratio * 0.4).toFixed(2);
+        cropZoom.max = (ratio * 4).toFixed(2);
+        cropZoom.value = ratio.toFixed(2);
+      },
+    });
+  }
+  // Keep the slider in sync when the user pinches/scroll-wheels to zoom
+  cropImage.addEventListener("zoom", (e) => {
+    cropZoom.value = e.detail.ratio;
+  });
+
+  function closeCropModal() {
+    cropModal.classList.add("hidden");
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+  }
+
+  cropZoom.addEventListener("input", () => {
+    if (cropper) cropper.zoomTo(parseFloat(cropZoom.value));
+  });
+
+  $("#crop-cancel").addEventListener("click", () => {
+    closeCropModal();
+    $("#post-image").value = "";
+    $("#post-image-filename").textContent = "No file chosen";
+  });
+
+  $("#crop-confirm").addEventListener("click", () => {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+      width: 900,
+      height: Math.round(900 / CROP_ASPECT_RATIO),
+      imageSmoothingQuality: "high",
+    });
+    canvas.toBlob((blob) => {
+      pendingImageBlob = blob;
+      $("#post-image-preview").src = canvas.toDataURL("image/jpeg", 0.9);
+      $("#post-image-preview").classList.remove("hidden");
+      closeCropModal();
+    }, "image/jpeg", 0.9);
+  });
+
   $("#post-image").addEventListener("change", () => {
     const file = $("#post-image").files[0];
     $("#post-image-filename").textContent = file ? file.name : "No file chosen";
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      $("#post-image-preview").src = reader.result;
-      $("#post-image-preview").classList.remove("hidden");
-    };
+    reader.onload = () => openCropModal(reader.result);
     reader.readAsDataURL(file);
   });
 
@@ -283,12 +382,11 @@
     try {
       const text = $("#post-text").value.trim();
       const memo_date = $("#post-date").value || null;
-      const file = $("#post-image").files[0];
 
       let image_key = pendingImageKey;
-      if (file) {
+      if (pendingImageBlob) {
         const fd = new FormData();
-        fd.append("image", file);
+        fd.append("image", pendingImageBlob, "capsule.jpg");
         const uploadRes = await api("/api/upload", { method: "POST", body: fd });
         image_key = uploadRes.image_key;
       }
@@ -362,6 +460,7 @@
   function startEdit(capsule) {
     state.editingId = capsule.id;
     pendingImageKey = capsule.image_key || null;
+    pendingImageBlob = null;
     $("#post-title").innerHTML = `Edit Capsule for ${nameSpan(state.partnerName || "them")}`;
     $("#post-text").value = capsule.text;
     $("#post-date").value = capsule.memo_date || "";
