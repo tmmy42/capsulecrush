@@ -843,6 +843,11 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   grid-template-columns: repeat(3, 1fr);
   gap: 36px;
 }
+/* Deliberately the same look as .capsule-card on the list screen (same
+   border/radius/padding proportions, same img treatment below) so the
+   album never has its own drifted styling to keep in sync — overflow:
+   hidden is the safety net that guarantees nothing (a photo included)
+   can ever visually escape this card's own rounded corners. */
 .album-card {
   background: var(--color-surface);
   border: 3px solid var(--color-ink);
@@ -852,32 +857,20 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow: hidden;
 }
 .album-card-b { background: #FFF0F7; }
 .album-card-c { background: #EAF8FF; }
-/* object-fit: contain, not cover — cover crops away anything past
-   whichever dimension overflows the box, and even a sub-pixel mismatch
-   between the box's actual rendered ratio and the saved file's own
-   pixel ratio (let alone an older photo saved under a since-changed
-   crop ratio) makes it visibly zoom in and re-crop past what the user
-   already chose when trimming the photo. contain never crops — it just
-   scales the whole image down to fit, so what was cropped at upload is
-   exactly what shows here, with background: inherit filling any
-   leftover letterbox strip with the card's own theme-consistent
-   background color instead of leaving it blank.
-   aspect-ratio is a live-DOM/CSS convenience only — html2canvas's layout
-   engine doesn't reliably understand that property, so generateAlbum()
-   in app.js also sets each of these images' height as an explicit
-   inline pixel value (computed from its own rendered width * 3/4)
-   right before capture, which is what actually keeps the box correctly
-   proportioned in the captured PNG. */
+/* Same treatment as .capsule-card img on the list screen: object-fit:
+   cover filling its box edge-to-edge. Every photo is already cropped to
+   this same 4:3 ratio at upload time, so cover has essentially nothing
+   left to crop away here. */
 .album-card-img {
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: contain;
-  background: inherit;
-  border-radius: var(--shape-sm);
-  border: 2px solid var(--color-ink);
+  object-fit: cover;
+  border-radius: var(--shape-xs);
+  border: var(--line-thin) solid var(--color-ink);
 }
 .album-card-date { font-size: .85rem; font-weight: 700; color: var(--color-tertiary); font-style: italic; }
 .album-card-text {
