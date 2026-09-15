@@ -367,8 +367,72 @@
 
   const lever = $("#lever");
   const fallingCapsule = $("#falling-capsule");
+  const capsuleTopEl = fallingCapsule.querySelector(".capsule-top");
   const btnGasha = $("#btn-gasha");
   let leverRotation = 0;
+
+  // Same retro-pop palette as the gashapon dome's own candy circles (see
+  // the dome <circle fill="..."> values in index.html) — pink/sky-blue/
+  // purple/yellow — so a randomly-colored result capsule always reads as
+  // "one of the capsules from the machine" rather than an off-palette hue.
+  const CAPSULE_COLORS = ["#FF5FA0", "#43C6F0", "#8F6FEF", "#FFD23F"];
+
+  function brightenHex(hex, ratio) {
+    const n = parseInt(hex.slice(1), 16);
+    const mix = (c) => Math.round(c + (255 - c) * ratio);
+    const r = mix((n >> 16) & 255);
+    const g = mix((n >> 8) & 255);
+    const b = mix(n & 255);
+    return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+  }
+
+  // Same 3-tier grain system used for the background stars and the dome's
+  // sky-blue candies (rare bright "hero" flecks, a mid layer of small
+  // bright dots, a bulk layer of tinted grains) — tinted off of whatever
+  // capsule color was just rolled, rather than a fixed hue, and scaled
+  // down for the capsule's much smaller 38x19 size. Baked as a flat
+  // rect + grains rather than a shape outline, since the CSS element's
+  // own border-radius already clips this image to the capsule-top's
+  // rounded shape.
+  function buildCapsuleGlitterDataUri(baseColor) {
+    const w = 38;
+    const h = 19;
+    const grains = [];
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() * w).toFixed(2);
+      const y = (Math.random() * h).toFixed(2);
+      const roll = Math.random();
+      if (roll < 0.1) {
+        const r = (0.55 + Math.random() * 0.45).toFixed(2);
+        grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${brightenHex(baseColor, 0.97)}" opacity="1"/>`);
+      } else if (roll < 0.4) {
+        const r = (0.22 + Math.random() * 0.18).toFixed(2);
+        const op = (0.9 + Math.random() * 0.1).toFixed(2);
+        grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${brightenHex(baseColor, 0.9)}" opacity="${op}"/>`);
+      } else {
+        const r = (0.08 + Math.random() * 0.14).toFixed(2);
+        const op = (0.85 + Math.random() * 0.15).toFixed(2);
+        const tint = brightenHex(baseColor, 0.68 + Math.random() * 0.22);
+        grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${tint}" opacity="${op}"/>`);
+      }
+    }
+    const svgMarkup =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+      `<rect width="${w}" height="${h}" fill="${baseColor}"/>${grains.join("")}</svg>`;
+    return `data:image/svg+xml;base64,${btoa(svgMarkup)}`;
+  }
+
+  // Rerolled on every pull so the reveal never shows the same capsule
+  // shell color/glitter twice in a row by coincidence-free design.
+  function rerollCapsuleAppearance() {
+    const color = CAPSULE_COLORS[Math.floor(Math.random() * CAPSULE_COLORS.length)];
+    capsuleTopEl.style.backgroundImage =
+      `radial-gradient(circle at 30% 20%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 40%), ` +
+      `url("${buildCapsuleGlitterDataUri(color)}")`;
+    capsuleTopEl.style.backgroundSize = "auto, 100% 100%";
+    capsuleTopEl.style.backgroundRepeat = "no-repeat, no-repeat";
+  }
 
   async function runGasha() {
     if (state.isGashaRunning) return;
@@ -396,6 +460,7 @@
       return;
     }
 
+    rerollCapsuleAppearance();
     fallingCapsule.classList.remove("hidden", "dropping", "popping");
     void fallingCapsule.offsetWidth; // reflow to restart animation
     fallingCapsule.classList.add("dropping");
