@@ -552,13 +552,14 @@
   }
 
   // ---------- photo crop ----------
-  // Portrait 4:5, matching every place a photo actually renders (the
-  // list-view card thumbnail, the album collage card, the upload preview,
-  // and the gasha result image all share this same aspect-ratio + object-
-  // fit: cover), so what's cropped here is exactly what's shown later,
-  // everywhere, with no extra top/bottom or left/right cropping beyond
-  // what the user already chose.
-  const CROP_ASPECT_RATIO = 4 / 5;
+  // Landscape 4:3. The list-view card thumbnail, the upload preview, and
+  // the gasha result image share this same aspect-ratio + object-fit:
+  // cover, so what's cropped here matches what's shown there with no
+  // extra top/bottom or left/right cropping beyond what the user already
+  // chose. The album collage card is the one exception — it uses object-
+  // fit: contain instead of a shared ratio, since it also has to display
+  // photos cropped before this ratio existed without distorting them.
+  const CROP_ASPECT_RATIO = 4 / 3;
 
   const cropModal = $("#crop-modal");
   const cropImage = $("#crop-image");

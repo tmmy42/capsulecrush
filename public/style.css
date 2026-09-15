@@ -552,6 +552,13 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   border-radius: 0 0 19px 19px;
   border-top: none;
 }
+/* While the two halves are joined, the shared seam has no border (the
+   two border-bottom/border-top: none rules above) so it reads as one
+   solid capsule. Once popping pulls them apart, that same edge is now
+   a visible cut face and needs the same outline as the rest of the
+   capsule's silhouette, or it looks like an open, unbordered gap. */
+.falling-capsule.popping .capsule-top { border-bottom: 1.818px solid var(--color-ink); }
+.falling-capsule.popping .capsule-bottom { border-top: 1.818px solid var(--color-ink); }
 
 /* The ONE deliberate animated sequence in the app: dial turn -> drop -> pop */
 .falling-capsule.dropping { animation: dropAndRoll 1.1s ease-in forwards; }
@@ -631,7 +638,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 .result-image {
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: var(--shape-md);
   border: var(--line-thin) solid var(--color-ink);
@@ -643,7 +650,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .post-form textarea { resize: vertical; }
 .image-preview {
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: var(--shape-md);
   border: var(--line-thin) solid var(--color-ink);
@@ -672,7 +679,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .capsule-card:nth-child(3n+3) { background: #EAF8FF; }
 .capsule-card img {
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: var(--shape-xs);
   border: var(--line-thin) solid var(--color-ink);
@@ -840,10 +847,17 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 .album-card-b { background: #FFF0F7; }
 .album-card-c { background: #EAF8FF; }
+/* object-fit: contain (not cover) — the album has to display photos
+   cropped at whatever ratio was in effect when they were saved
+   (4:5 before this, 4:3 now, and this box's own 4:3 besides), so
+   cropping to fill would either distort or chop into an image whose
+   real proportions don't match the box. Letterboxing on the card's own
+   background keeps every photo's original ratio intact instead. */
 .album-card-img {
   width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: inherit;
   border-radius: var(--shape-sm);
   border: 2px solid var(--color-ink);
 }
@@ -1032,7 +1046,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .crop-title { font-weight: 600; margin: 0 0 var(--space-3); text-align: center; }
 .crop-container {
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   background: #000;
   border-radius: var(--shape-sm);
   overflow: hidden;
