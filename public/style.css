@@ -732,6 +732,13 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   background-size: cover;
   background-position: center top;
   font-family: var(--font-body);
+  /* Mobile Safari can silently inflate text past its declared font-size
+     on a narrow viewport ("text autosizing"), independent of anything
+     this element's own fixed 900px layout declares — the accent-line
+     and tagline-icon images don't get that same boost, so the two drift
+     out of sync exactly on phones. This turns that inflation off. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 /* Recipient-first header: no wordmark — the two names being connected
    are the whole point of a gift like this, so they carry the visual
@@ -761,11 +768,16 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   margin: 0 16px;
 }
 /* Tapered diagonal accent blade flanking each side of the names, filled
-   + thin-outlined to match the name text's own colors. */
+   + thin-outlined to match the name text's own colors. Sized/positioned
+   in em (relative to .album-names's own font-size, 36px/34px/-4px at
+   the 3.4rem=54.4px base this was designed against) rather than fixed
+   px, so it scales in lockstep with the name text no matter what
+   shrinks or inflates that font-size — the fit-to-width shrink in
+   generateAlbum() and any renderer-level text scaling alike. */
 .album-names-accent {
-  width: 36px;
-  height: 34px;
-  vertical-align: -4px;
+  width: 0.6618em;
+  height: 0.625em;
+  vertical-align: -0.0735em;
   margin: 0 0;
 }
 .album-tagline {
@@ -779,12 +791,16 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 /* Thought-bubble icon right after the tagline text — fixed black
    outline / white fill, sized to sit comfortably inline with the
    tagline's own text height, nudged further down than plain inline
-   alignment would place it. */
+   alignment would place it. Sized/positioned in em (relative to
+   .album-tagline's own font-size, 34px/-12px/2px at the 1.4rem=22.4px
+   base this was designed against) rather than fixed px, so it scales
+   in lockstep with the tagline text instead of drifting out of sync
+   with it. */
 .album-tagline-icon {
-  width: 34px;
-  height: 34px;
-  vertical-align: -12px;
-  margin-left: 2px;
+  width: 1.518em;
+  height: 1.518em;
+  vertical-align: -0.536em;
+  margin-left: 0.0893em;
 }
 .album-grid {
   display: grid;
