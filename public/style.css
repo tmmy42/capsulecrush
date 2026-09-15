@@ -855,25 +855,27 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 .album-card-b { background: #FFF0F7; }
 .album-card-c { background: #EAF8FF; }
-/* object-fit: contain (not cover) — the album has to display photos
-   cropped at whatever ratio was in effect when they were saved
-   (4:5 before this, 4:3 now, and this box's own 4:3 besides), so
-   cropping to fill would either distort or chop into an image whose
-   real proportions don't match the box. Letterboxing on the card's own
-   background keeps every photo's original ratio intact instead. */
-/* aspect-ratio here is a live-DOM/CSS convenience only — html2canvas's
-   layout engine doesn't reliably understand the aspect-ratio property,
-   so generateAlbum() in app.js also sets each of these images' height
-   as an explicit inline pixel value (computed from its own rendered
-   width * 3/4) right before capture, which is what actually keeps the
-   box correctly proportioned in the captured PNG. Every photo is
-   cropped to this same 4:3 ratio at upload time, so object-fit: cover
-   never needs to crop anything away here — it's just the standard safe
-   default once source and box ratios already match. */
+/* object-fit: contain, not cover — cover crops away anything past
+   whichever dimension overflows the box, and even a sub-pixel mismatch
+   between the box's actual rendered ratio and the saved file's own
+   pixel ratio (let alone an older photo saved under a since-changed
+   crop ratio) makes it visibly zoom in and re-crop past what the user
+   already chose when trimming the photo. contain never crops — it just
+   scales the whole image down to fit, so what was cropped at upload is
+   exactly what shows here, with background: inherit filling any
+   leftover letterbox strip with the card's own theme-consistent
+   background color instead of leaving it blank.
+   aspect-ratio is a live-DOM/CSS convenience only — html2canvas's layout
+   engine doesn't reliably understand that property, so generateAlbum()
+   in app.js also sets each of these images' height as an explicit
+   inline pixel value (computed from its own rendered width * 3/4)
+   right before capture, which is what actually keeps the box correctly
+   proportioned in the captured PNG. */
 .album-card-img {
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  object-fit: contain;
+  background: inherit;
   border-radius: var(--shape-sm);
   border: 2px solid var(--color-ink);
 }

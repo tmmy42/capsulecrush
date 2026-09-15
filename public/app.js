@@ -873,6 +873,45 @@
     ctx.restore();
   }
 
+  // Same rationale as the accent-line/icon drawing above: html2canvas's
+  // layout/paint engine doesn't reliably honor either the aspect-ratio
+  // or the object-fit CSS properties (confirmed by measuring an actual
+  // exported album — a photo's content was still visibly cropped
+  // tighter than the saved file even with object-fit: contain in the
+  // stylesheet), so this replicates "contain" manually with a plain
+  // drawImage call using the photo's own natural pixel dimensions,
+  // sidestepping html2canvas's object-fit handling entirely. `imgEl` is
+  // still readable here even though its src has been swapped to a blank
+  // placeholder for the capture (see generateAlbum) — the element
+  // itself, with its already-decoded original bitmap, is what gets
+  // drawn, not whatever its current src attribute points to.
+  function drawAlbumPhotoOnCanvas(ctx, imgEl, rect, containerRect, canvasScale) {
+    const box = toCanvasBox(rect, containerRect, canvasScale);
+    const nw = imgEl.naturalWidth;
+    const nh = imgEl.naturalHeight;
+    if (!nw || !nh) return;
+    const scale = Math.min(box.w / nw, box.h / nh);
+    const drawW = nw * scale;
+    const drawH = nh * scale;
+    const offsetX = box.x + (box.w - drawW) / 2;
+    const offsetY = box.y + (box.h - drawH) / 2;
+    // Matches .album-card-img's own border-radius (--shape-sm: 14px) so
+    // a "contain"-fit edge that touches the box's own edge doesn't square
+    // off a corner html2canvas already drew rounded underneath.
+    const radius = 14 * canvasScale;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(box.x + radius, box.y);
+    ctx.arcTo(box.x + box.w, box.y, box.x + box.w, box.y + box.h, radius);
+    ctx.arcTo(box.x + box.w, box.y + box.h, box.x, box.y + box.h, radius);
+    ctx.arcTo(box.x, box.y + box.h, box.x, box.y, radius);
+    ctx.arcTo(box.x, box.y, box.x + box.w, box.y, radius);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(imgEl, offsetX, offsetY, drawW, drawH);
+    ctx.restore();
+  }
+
   // Custom thought-bubble icon appended right after the tagline text — a
   // bumpy cloud silhouette with two small trailing circles beneath it,
   // the classic "thinking" bubble shape. Not in Lucide's set, so hand-
@@ -1209,6 +1248,41 @@
       accentImgs.forEach((img) => (img.style.visibility = "hidden"));
       if (iconImg) iconImg.style.visibility = "hidden";
 
+      // Same treatment for the capsule photos: html2canvas doesn't
+      // reliably honor object-fit either (confirmed by measuring an
+      // actual export — a photo came out visibly cropped tighter than
+      // the saved file despite object-fit: contain in the stylesheet),
+      // so each photo gets redrawn manually afterward (see
+      // drawAlbumPhotoOnCanvas above). The 1x1 transparent GIF standing
+      // in for its src during capture keeps the element's own border/
+      // border-radius/background rendering intact (those are simple box
+      // properties html2canvas draws fine) while giving it no bitmap
+      // content for html2canvas to mis-scale. drawImage needs the actual
+      // decoded photo, though, and that DOM <img> is about to lose it —
+      // so a separate, untouched Image is preloaded from the same
+      // (already browser-cached) URL for each one first, and that
+      // detached snapshot is what actually gets drawn later, not the
+      // now-blanked DOM element.
+      const BLANK_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+      const albumPhotoImgs = Array.from(container.querySelectorAll(".album-card-img"));
+      const albumPhotoDraws = await Promise.all(
+        albumPhotoImgs.map(async (img) => {
+          const rect = img.getBoundingClientRect();
+          const snapshot = new Image();
+          snapshot.src = img.src;
+          if (!snapshot.complete) {
+            await new Promise((resolve) => {
+              snapshot.onload = resolve;
+              snapshot.onerror = resolve;
+            });
+          }
+          return { snapshot, rect };
+        })
+      );
+      albumPhotoImgs.forEach((img) => {
+        img.src = BLANK_PIXEL;
+      });
+
       // html2canvas defaults its internal render window to the real
       // device's viewport size unless told otherwise — on a narrow phone
       // that can misjudge this off-screen, fixed-width element's true
@@ -1247,6 +1321,9 @@
         } else {
           drawAccentBladeOnCanvas(ctx, d.rect, containerRectPre, 2, d.side, theme.nameFill, theme.nameStroke);
         }
+      });
+      albumPhotoDraws.forEach((d) => {
+        drawAlbumPhotoOnCanvas(ctx, d.snapshot, d.rect, containerRectPre, 2);
       });
 
       albumBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
