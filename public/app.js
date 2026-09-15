@@ -674,6 +674,103 @@
   let albumBlob = null;
   let albumSetupTheme = DEFAULT_THEME;
 
+  // Every previous fix for the accent-line/tagline-icon clipping bug
+  // adjusted the *SVG* representation of these two decorations (viewBox
+  // margins, stroke-linejoin, em vs px sizing) and each still left open
+  // the possibility that the actual failure point was html2canvas (or
+  // Safari's canvas backend) rasterizing a base64 <img src="data:...svg">
+  // slightly differently than Chrome does — something that can't be
+  // verified without a real device. This sidesteps that uncertainty
+  // entirely: the <img> placeholders still exist in the DOM (so the
+  // fit-to-width shrink logic and normal inline text flow still size and
+  // position them exactly as before), but they're switched to
+  // visibility:hidden right before capture, and these two functions redraw
+  // the same shapes directly onto html2canvas's own output canvas using
+  // native Canvas 2D calls instead — no image decoding, no SVG rendering,
+  // nothing left for any renderer to disagree with Chrome about. `rect` is
+  // the placeholder's own getBoundingClientRect(); `containerRect` and
+  // `canvasScale` convert that viewport-relative box into the html2canvas
+  // output canvas's own pixel space.
+  function toCanvasBox(rect, containerRect, canvasScale) {
+    return {
+      x: (rect.left - containerRect.left) * canvasScale,
+      y: (rect.top - containerRect.top) * canvasScale,
+      w: rect.width * canvasScale,
+      h: rect.height * canvasScale,
+    };
+  }
+
+  function drawAccentBladeOnCanvas(ctx, rect, containerRect, canvasScale, side, fillColor, strokeColor) {
+    const box = toCanvasBox(rect, containerRect, canvasScale);
+    const viewW = 48;
+    const viewH = 44;
+    const primaryLeft = [
+      [20, 10],
+      [32, 4],
+      [46, 38],
+      [42, 40],
+    ];
+    const outerLeft = [
+      [6, 31],
+      [12, 25],
+      [21, 38],
+      [19, 40],
+    ];
+    const mirror = (pts) => pts.map(([x, y]) => [viewW - x, y]);
+    const primary = side === "left" ? primaryLeft : mirror(primaryLeft);
+    const outer = side === "left" ? outerLeft : mirror(outerLeft);
+    const polygonPath = (pts) => {
+      const p = new Path2D();
+      pts.forEach(([x, y], i) => (i === 0 ? p.moveTo(x, y) : p.lineTo(x, y)));
+      p.closePath();
+      return p;
+    };
+    ctx.save();
+    ctx.translate(box.x, box.y);
+    ctx.scale(box.w / viewW, box.h / viewH);
+    ctx.lineJoin = "miter";
+    ctx.lineWidth = 2;
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = strokeColor;
+    [outer, primary].forEach((pts) => {
+      const path = polygonPath(pts);
+      ctx.fill(path);
+      ctx.stroke(path);
+    });
+    ctx.restore();
+  }
+
+  function drawTaglineIconOnCanvas(ctx, rect, containerRect, canvasScale) {
+    const box = toCanvasBox(rect, containerRect, canvasScale);
+    // Same viewBox as buildTaglineIcon(): "-6 0 60 60" — width/height 60,
+    // origin shifted left by 6 to make room for the trailing circles.
+    const viewSize = 60;
+    const viewMinX = -6;
+    const cloud = new Path2D(
+      "M15,34 A6.5,6.5 0 0 1 15,21 A9,9 0 0 1 33,18 A8,8 0 0 1 46,27 A6.5,6.5 0 0 1 42,34 Z"
+    );
+    ctx.save();
+    ctx.translate(box.x, box.y);
+    ctx.scale(box.w / viewSize, box.h / viewSize);
+    ctx.translate(-viewMinX, 0);
+    ctx.lineWidth = 2.2;
+    ctx.fillStyle = "#FFFFFF";
+    ctx.strokeStyle = "#1A1A1A";
+    ctx.lineJoin = "round";
+    ctx.fill(cloud);
+    ctx.stroke(cloud);
+    [
+      [8, 45, 5.5],
+      [-2, 55, 3],
+    ].forEach(([cx, cy, r]) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
   // Custom thought-bubble icon appended right after the tagline text — a
   // bumpy cloud silhouette with two small trailing circles beneath it,
   // the classic "thinking" bubble shape. Not in Lucide's set, so hand-
@@ -945,6 +1042,58 @@
         }
       }
 
+      // Measure every accent-line/icon placeholder's final on-screen box
+      // *before* capture and log it, per the explicit ask to verify this
+      // with real coordinates rather than "checked visually" — each must
+      // sit fully inside [0, container width/height]. Then hide them
+      // (visibility:hidden keeps their layout box, so nothing else
+      // reflows) so html2canvas's canvas ends up with blank space where
+      // they'd be, and that space gets redrawn natively (see
+      // drawAccentBladeOnCanvas/drawTaglineIconOnCanvas above) after
+      // capture instead — removing image/SVG rasterization from this
+      // path altogether rather than continuing to tune its parameters.
+      const containerRectPre = container.getBoundingClientRect();
+      const accentImgs = Array.from(container.querySelectorAll(".album-names-accent"));
+      const iconImg = container.querySelector(".album-tagline-icon");
+      const decorCheck = [];
+      accentImgs.forEach((img, i) => {
+        const r = img.getBoundingClientRect();
+        decorCheck.push({
+          el: `accent-line[${i === 0 ? "left" : "right"}]`,
+          left: r.left - containerRectPre.left,
+          top: r.top - containerRectPre.top,
+          right: r.right - containerRectPre.left,
+          bottom: r.bottom - containerRectPre.top,
+        });
+      });
+      if (iconImg) {
+        const r = iconImg.getBoundingClientRect();
+        decorCheck.push({
+          el: "tagline-icon",
+          left: r.left - containerRectPre.left,
+          top: r.top - containerRectPre.top,
+          right: r.right - containerRectPre.left,
+          bottom: r.bottom - containerRectPre.top,
+        });
+      }
+      const containerBoxW = containerRectPre.width;
+      const containerBoxH = container.scrollHeight;
+      const allWithinBounds = decorCheck.every(
+        (d) => d.left >= 0 && d.top >= 0 && d.right <= containerBoxW && d.bottom <= containerBoxH
+      );
+      console.log("[album fit-check] container box:", { width: containerBoxW, height: containerBoxH });
+      console.table(decorCheck);
+      console.log("[album fit-check] all decorations within bounds:", allWithinBounds);
+
+      const decorDraws = accentImgs
+        .map((img, i) => ({
+          rect: img.getBoundingClientRect(),
+          side: i === 0 ? "left" : "right",
+        }))
+        .concat(iconImg ? [{ rect: iconImg.getBoundingClientRect(), isIcon: true }] : []);
+      accentImgs.forEach((img) => (img.style.visibility = "hidden"));
+      if (iconImg) iconImg.style.visibility = "hidden";
+
       // html2canvas defaults its internal render window to the real
       // device's viewport size unless told otherwise — on a narrow phone
       // that can misjudge this off-screen, fixed-width element's true
@@ -962,6 +1111,27 @@
         useCORS: true,
         windowWidth: ALBUM_WIDTH - ALBUM_LEFT_OFFSET + 400,
         windowHeight: Math.max(1600, contentHeight + 400),
+      });
+
+      const ctx = canvas.getContext("2d");
+      // html2canvas doesn't hand the context back in a clean state — it
+      // leaves whatever transform (translate + scale) it used internally
+      // for its own last paint operation still active. Drawing through
+      // that residual transform silently compounds with this function's
+      // own translate/scale below, landing everything at the wrong
+      // position and size (confirmed by instrumenting: a plain fillRect
+      // at the "right" coordinates came out roughly 2x too big and
+      // hundreds of pixels off). Resetting to the identity matrix first
+      // makes this canvas's coordinate space match its own pixel
+      // dimensions exactly, as documented, before this draws anything
+      // onto it.
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      decorDraws.forEach((d) => {
+        if (d.isIcon) {
+          drawTaglineIconOnCanvas(ctx, d.rect, containerRectPre, 2);
+        } else {
+          drawAccentBladeOnCanvas(ctx, d.rect, containerRectPre, 2, d.side, theme.nameFill, theme.nameStroke);
+        }
       });
 
       albumBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
