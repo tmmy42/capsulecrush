@@ -18,18 +18,31 @@
   // This is a single-page app — "navigating" between screens never
   // reloads the document, so if the user had pinch-zoomed in on iOS
   // Safari, that zoom level just carries over onto the next screen
-  // untouched. Briefly forcing the viewport's max-scale to 1 makes
-  // mobile Safari snap the visual viewport back to 1x, then restoring
-  // the original content on the next frame puts pinch-zoom-ability back
-  // for the new screen — there's no direct "set zoom" API, this
-  // momentary-clamp is the standard workaround.
+  // untouched. A single, one-shot rewrite of the viewport meta's content
+  // (e.g. straight to the "reset" value) is not reliable on real iOS
+  // Safari — it often only re-runs its zoom/layout recalculation when it
+  // actually SEES the content attribute change value, so writing the
+  // final value directly can be a no-op if it happens to already match.
+  // Forcing it through an intermediate value first — distinct from both
+  // the base content and, via the trailing maximum-scale, from a bare
+  // repeat of itself — then restoring the real value one full frame
+  // later (not the same tick) reliably makes Safari re-evaluate the
+  // visual viewport and snap pinch-zoom back to 1x. There's no direct
+  // "set zoom" API; this is the standard workaround.
+  //
+  // The base value is captured once at load instead of re-read from the
+  // attribute on every call, so a reset that fires again before the
+  // previous one's restore has landed can't compound onto an
+  // already-mutated value.
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  const BASE_VIEWPORT_CONTENT = viewportMeta ? viewportMeta.getAttribute("content") : null;
   function resetPinchZoom() {
-    const viewport = document.querySelector('meta[name="viewport"]');
-    if (!viewport) return;
-    const original = viewport.getAttribute("content");
-    viewport.setAttribute("content", `${original}, maximum-scale=1.0`);
+    if (!viewportMeta || !BASE_VIEWPORT_CONTENT) return;
+    viewportMeta.setAttribute("content", `${BASE_VIEWPORT_CONTENT}, maximum-scale=1.0001`);
     requestAnimationFrame(() => {
-      viewport.setAttribute("content", original);
+      requestAnimationFrame(() => {
+        viewportMeta.setAttribute("content", BASE_VIEWPORT_CONTENT);
+      });
     });
   }
 

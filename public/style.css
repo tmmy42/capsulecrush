@@ -230,6 +230,14 @@ h1, h2 { font-family: var(--font-heading); font-style: italic; margin: 0; font-w
   font-weight: 500;
   color: var(--color-ink-soft);
 }
+.tagline-break { display: none; }
+@media (max-width: 480px) {
+  .tagline { margin-top: var(--space-3); }
+  /* Force the break right before "about" instead of wherever the
+     narrow width happens to wrap it, so it reads as two even lines:
+     "Capsule the things you love" / "about him/her". */
+  .tagline-break { display: block; }
+}
 
 /* "<name>? — Start the collection" reliably wraps at odd points on narrow
    phone widths (mid-word, or right after the em dash); force a clean break
