@@ -714,7 +714,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   gap: 4px;
   font-family: var(--font-heading);
   font-style: italic;
-  font-size: .78rem;
+  font-size: .7rem;
   font-weight: 500;
   padding: 8px 4px;
   border: var(--line-thin) solid var(--color-ink);
@@ -724,7 +724,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   color: var(--color-ink);
   min-height: 36px;
 }
-.card-actions button .icon { width: 14px; height: 14px; }
+.card-actions button .icon { width: 12px; height: 12px; }
 .card-actions button.danger { background: #FFDCE4; color: var(--color-error); border-color: var(--color-error); }
 
 .album-cta { margin-bottom: var(--space-4); }
