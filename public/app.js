@@ -1057,6 +1057,19 @@
         await document.fonts.ready;
       }
 
+      // .album-card-img is 4:3 via CSS aspect-ratio for the live DOM, but
+      // html2canvas's own layout engine doesn't reliably support that
+      // property — it can end up capturing these boxes at some other
+      // (often intrinsic-image-driven) height, which is exactly what
+      // produces the "photo looks stretched" bug in the exported PNG
+      // even though the ratio looks correct on screen. Pinning each
+      // one's height to an explicit pixel value derived from its own
+      // rendered width removes any dependency on html2canvas
+      // understanding aspect-ratio at all.
+      container.querySelectorAll(".album-card-img").forEach((img) => {
+        img.style.height = `${img.clientWidth * (3 / 4)}px`;
+      });
+
       // The album is always laid out at this one canonical size — never
       // measured from the live device viewport — so its content fits the
       // same way regardless of what screen generated it. (900px width,

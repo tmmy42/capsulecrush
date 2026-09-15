@@ -861,11 +861,19 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
    cropping to fill would either distort or chop into an image whose
    real proportions don't match the box. Letterboxing on the card's own
    background keeps every photo's original ratio intact instead. */
+/* aspect-ratio here is a live-DOM/CSS convenience only — html2canvas's
+   layout engine doesn't reliably understand the aspect-ratio property,
+   so generateAlbum() in app.js also sets each of these images' height
+   as an explicit inline pixel value (computed from its own rendered
+   width * 3/4) right before capture, which is what actually keeps the
+   box correctly proportioned in the captured PNG. Every photo is
+   cropped to this same 4:3 ratio at upload time, so object-fit: cover
+   never needs to crop anything away here — it's just the standard safe
+   default once source and box ratios already match. */
 .album-card-img {
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: contain;
-  background: inherit;
+  object-fit: cover;
   border-radius: var(--shape-sm);
   border: 2px solid var(--color-ink);
 }
