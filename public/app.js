@@ -371,11 +371,12 @@
   const btnGasha = $("#btn-gasha");
   let leverRotation = 0;
 
-  // Same retro-pop palette as the gashapon dome's own candy circles (see
-  // the dome <circle fill="..."> values in index.html) — pink/sky-blue/
-  // purple/yellow — so a randomly-colored result capsule always reads as
-  // "one of the capsules from the machine" rather than an off-palette hue.
-  const CAPSULE_COLORS = ["#FF5FA0", "#43C6F0", "#8F6FEF", "#FFD23F"];
+  // The dome's own candy circles (pink/sky-blue/purple/yellow) plus two
+  // more hues already established elsewhere in the app's own retro-pop
+  // palette — coral (the Sky & Coral album theme's accent) and a
+  // lighter bubblegum pink (the Lavender & Yellow theme's accent) — so
+  // there's more variety without introducing any off-palette color.
+  const CAPSULE_COLORS = ["#FF5FA0", "#43C6F0", "#8F6FEF", "#FFD23F", "#FF6B4A", "#FF8FD8"];
 
   function brightenHex(hex, ratio) {
     const n = parseInt(hex.slice(1), 16);
@@ -398,22 +399,22 @@
     const w = 38;
     const h = 19;
     const grains = [];
-    const count = 30;
+    const count = 55;
     for (let i = 0; i < count; i++) {
       const x = (Math.random() * w).toFixed(2);
       const y = (Math.random() * h).toFixed(2);
       const roll = Math.random();
-      if (roll < 0.1) {
-        const r = (0.55 + Math.random() * 0.45).toFixed(2);
-        grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${brightenHex(baseColor, 0.97)}" opacity="1"/>`);
-      } else if (roll < 0.4) {
-        const r = (0.22 + Math.random() * 0.18).toFixed(2);
-        const op = (0.9 + Math.random() * 0.1).toFixed(2);
-        grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${brightenHex(baseColor, 0.9)}" opacity="${op}"/>`);
+      if (roll < 0.14) {
+        const r = (0.65 + Math.random() * 0.75).toFixed(2);
+        grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${brightenHex(baseColor, 0.99)}" opacity="1"/>`);
+      } else if (roll < 0.45) {
+        const r = (0.3 + Math.random() * 0.3).toFixed(2);
+        const op = (0.92 + Math.random() * 0.08).toFixed(2);
+        grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${brightenHex(baseColor, 0.94)}" opacity="${op}"/>`);
       } else {
-        const r = (0.08 + Math.random() * 0.14).toFixed(2);
-        const op = (0.85 + Math.random() * 0.15).toFixed(2);
-        const tint = brightenHex(baseColor, 0.68 + Math.random() * 0.22);
+        const r = (0.09 + Math.random() * 0.2).toFixed(2);
+        const op = (0.88 + Math.random() * 0.12).toFixed(2);
+        const tint = brightenHex(baseColor, 0.72 + Math.random() * 0.24);
         grains.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${tint}" opacity="${op}"/>`);
       }
     }
