@@ -173,11 +173,14 @@ app.post("/api/auth/logout", requireAuth, async (c) => {
 
 app.get("/api/capsules", requireAuth, async (c) => {
   const userId = c.get("userId");
+  // Dated capsules sort newest memo_date first; undated ones sit out of
+  // that ordering entirely and fall back to posting order (created_at)
+  // instead, as their own trailing group rather than interleaved by date.
   const { results } = await c.env.DB.prepare(
     `SELECT id, text, memo_date, image_key, created_at, updated_at
        FROM capsules
       WHERE user_id = ?
-      ORDER BY created_at DESC`
+      ORDER BY (memo_date IS NULL) ASC, memo_date DESC, created_at DESC`
   )
     .bind(userId)
     .all();

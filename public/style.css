@@ -1063,6 +1063,9 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
   height: 5px !important;
   opacity: .75 !important;
 }
+/* Cropper.js's default handle color is its own generic blue (#39f), not
+   this app's own sky-blue accent (--color-secondary). */
+.cropper-point { background-color: var(--color-secondary) !important; }
 .crop-zoom-row {
   display: flex;
   align-items: center;
