@@ -66,6 +66,21 @@
 
 * { box-sizing: border-box; }
 
+/* Kill the default gray tap-highlight rectangle and focus ring on every
+   interactive control (buttons, links, the bottom-nav tabs, the gasha
+   lever) so taps feel native rather than "web app" — but :focus-visible
+   is left alone so keyboard/switch-control navigation still shows a
+   visible focus outline. */
+button, a, [role="button"], [role="tab"], .nav-btn, #lever, .icon-btn, .btn {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible, [role="tab"]:focus-visible,
+.nav-btn:focus-visible, #lever:focus-visible, .icon-btn:focus-visible, .btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 html {
   margin: 0;
   padding: 0;
@@ -616,6 +631,8 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 }
 .result-image {
   width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
   border-radius: var(--shape-md);
   border: var(--line-thin) solid var(--color-ink);
   margin-bottom: var(--space-5);
@@ -626,7 +643,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .post-form textarea { resize: vertical; }
 .image-preview {
   width: 100%;
-  max-height: 220px;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
   border-radius: var(--shape-md);
   border: var(--line-thin) solid var(--color-ink);
@@ -655,7 +672,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .capsule-card:nth-child(3n+3) { background: #EAF8FF; }
 .capsule-card img {
   width: 100%;
-  height: 90px;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
   border-radius: var(--shape-xs);
   border: var(--line-thin) solid var(--color-ink);
@@ -825,7 +842,7 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .album-card-c { background: #EAF8FF; }
 .album-card-img {
   width: 100%;
-  height: 170px;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
   border-radius: var(--shape-sm);
   border: 2px solid var(--color-ink);
@@ -1015,13 +1032,23 @@ input:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 
 .crop-title { font-weight: 600; margin: 0 0 var(--space-3); text-align: center; }
 .crop-container {
   width: 100%;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 5;
   background: #000;
   border-radius: var(--shape-sm);
   overflow: hidden;
   border: var(--line-thin) solid var(--color-ink);
 }
 .crop-container img { display: block; max-width: 100%; }
+/* Cropper.js's own default CSS deliberately makes the bottom-right resize
+   point much larger than the other seven handles (20px vs 5px, shrinking
+   at wider breakpoints) as a bigger touch target — but that reads as an
+   unbalanced, buggy-looking mismatch here, so it's pinned to the same
+   size as every other handle. */
+.cropper-point.point-se {
+  width: 5px !important;
+  height: 5px !important;
+  opacity: .75 !important;
+}
 .crop-zoom-row {
   display: flex;
   align-items: center;

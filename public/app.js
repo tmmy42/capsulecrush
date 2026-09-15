@@ -15,6 +15,24 @@
     window.visualViewport.addEventListener("resize", syncViewportHeight);
   }
 
+  // This is a single-page app — "navigating" between screens never
+  // reloads the document, so if the user had pinch-zoomed in on iOS
+  // Safari, that zoom level just carries over onto the next screen
+  // untouched. Briefly forcing the viewport's max-scale to 1 makes
+  // mobile Safari snap the visual viewport back to 1x, then restoring
+  // the original content on the next frame puts pinch-zoom-ability back
+  // for the new screen — there's no direct "set zoom" API, this
+  // momentary-clamp is the standard workaround.
+  function resetPinchZoom() {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) return;
+    const original = viewport.getAttribute("content");
+    viewport.setAttribute("content", `${original}, maximum-scale=1.0`);
+    requestAnimationFrame(() => {
+      viewport.setAttribute("content", original);
+    });
+  }
+
   // ---------- background themes ----------
   // Same checker pattern + star style everywhere — only the two checker
   // colors and the six star colors change between themes (see
@@ -118,6 +136,7 @@
   }
 
   function showScreen(name) {
+    resetPinchZoom();
     Object.entries(screens).forEach(([key, el]) => el.classList.toggle("hidden", key !== name));
     bottomNav.classList.toggle("hidden", name === "auth");
     if (name !== "auth") {
@@ -533,10 +552,13 @@
   }
 
   // ---------- photo crop ----------
-  // The crop frame's aspect ratio matches how photos actually render in the
-  // app (the list-view capsule card thumbnail: a fixed-height, object-fit:
-  // cover strip), so what the user crops is exactly what they'll see later.
-  const CROP_ASPECT_RATIO = 3 / 2;
+  // Portrait 4:5, matching every place a photo actually renders (the
+  // list-view card thumbnail, the album collage card, the upload preview,
+  // and the gasha result image all share this same aspect-ratio + object-
+  // fit: cover), so what's cropped here is exactly what's shown later,
+  // everywhere, with no extra top/bottom or left/right cropping beyond
+  // what the user already chose.
+  const CROP_ASPECT_RATIO = 4 / 5;
 
   const cropModal = $("#crop-modal");
   const cropImage = $("#crop-image");
